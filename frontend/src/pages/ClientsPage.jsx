@@ -63,7 +63,7 @@ function ClientCard({ c }) {
             {[c.category, c.city].filter(Boolean).join(' · ')}
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 }}>
           <StatusBadge status={c.status} />
           {c.plan_name && <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-text)', background: 'var(--accent-light)', padding: '2px 7px', borderRadius: 4 }}>{c.plan_name}</span>}
         </div>
