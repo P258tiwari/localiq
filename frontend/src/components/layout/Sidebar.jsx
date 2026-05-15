@@ -121,37 +121,72 @@ export default function Sidebar() {
 
       {/* Active Clients list */}
       {showLabels && (
-        <div style={{ flex: 1, overflowY: 'auto', padding: '10px 8px' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 10px 8px' }}>
-            Active Clients
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px 12px' }}>
+          {/* Section header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px 8px' }}>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Active Clients
+            </span>
+            {clientCount > 0 && (
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--accent-text)', background: 'var(--accent-light)', borderRadius: 10, padding: '1px 6px' }}>
+                {clientCount}
+              </span>
+            )}
           </div>
-          {activeClients.map(c => (
-            <NavLink
-              key={c.id}
-              to={`/clients/${c.id}`}
-              onClick={() => isMobile && setMobileOpen(false)}
-              style={({ isActive }) => ({
-                display: 'flex', alignItems: 'center', gap: 8,
-                padding: '6px 10px', borderRadius: 8, marginBottom: 1,
-                textDecoration: 'none', transition: 'background 0.1s',
-                background: isActive ? 'var(--accent-light)' : 'transparent',
-              })}
-              onMouseEnter={e => { if (!e.currentTarget.classList.contains('active')) e.currentTarget.style.background = 'var(--bg-input)'; }}
-              onMouseLeave={e => { if (!e.currentTarget.classList.contains('active')) e.currentTarget.style.background = 'transparent'; }}
-            >
-              {c.logo_url
-                ? <img src={c.logo_url} alt="" onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'inline-block'; }} style={{ width: 20, height: 20, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
-                : null
-              }
-              <span style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: 'var(--green-text)', display: c.logo_url ? 'none' : 'inline-block' }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.business_name}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{c.city}</div>
-              </div>
-            </NavLink>
-          ))}
+
+          {activeClients.map(c => {
+            const initials = (c.business_name || '?').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+            return (
+              <NavLink
+                key={c.id}
+                to={`/clients/${c.id}`}
+                onClick={() => isMobile && setMobileOpen(false)}
+                style={({ isActive }) => ({
+                  display: 'flex', alignItems: 'center', gap: 9,
+                  padding: '7px 10px', borderRadius: 10, marginBottom: 2,
+                  textDecoration: 'none', transition: 'background 0.15s',
+                  background: isActive ? 'var(--accent-light)' : 'transparent',
+                  border: isActive ? '1px solid rgba(108,62,244,0.18)' : '1px solid transparent',
+                })}
+                onMouseEnter={e => { if (!e.currentTarget.style.borderColor.includes('108')) e.currentTarget.style.background = 'var(--bg-input)'; }}
+                onMouseLeave={e => { if (!e.currentTarget.style.borderColor.includes('108')) e.currentTarget.style.background = 'transparent'; }}
+              >
+                {/* Avatar */}
+                {c.logo_url ? (
+                  <img
+                    src={c.logo_url}
+                    alt=""
+                    style={{ width: 28, height: 28, borderRadius: 7, objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border)' }}
+                    onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
+                  />
+                ) : null}
+                <div style={{
+                  width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+                  background: 'linear-gradient(135deg, var(--accent) 0%, #9b6dff 100%)',
+                  display: c.logo_url ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: '0.02em',
+                }}>
+                  {initials}
+                </div>
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.3 }}>
+                    {c.business_name}
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {c.city || 'No city'}
+                  </div>
+                </div>
+
+                {/* Active dot */}
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--green-text)', flexShrink: 0 }} />
+              </NavLink>
+            );
+          })}
+
           {activeClients.length === 0 && (
-            <div style={{ padding: '8px 10px', fontSize: 12, color: 'var(--text-muted)' }}>No active clients</div>
+            <div style={{ padding: '12px 10px', fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>No active clients</div>
           )}
         </div>
       )}
