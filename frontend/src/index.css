@@ -234,6 +234,7 @@ html, body, #root {
   .input::placeholder { color: var(--text-muted); }
   .input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(108,62,244,0.15); }
   select.input { cursor: pointer; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0); cursor: pointer; }
 
   .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium; }
   .badge-green  { background: var(--green-light);  color: var(--green-text);  }
