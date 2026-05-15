@@ -60,10 +60,14 @@ export default function BillingPage() {
     const planOk   = planFilter === 'All Plans' || b.plan_name === planFilter;
     let dateOk = true;
     if (dateFrom || dateTo) {
-      const d = b.next_due_date ? b.next_due_date.slice(0, 10) : null;
-      if (!d) return false;
-      if (dateFrom && d < dateFrom) dateOk = false;
-      if (dateTo   && d > dateTo)   dateOk = false;
+      // Paid tab → filter by last_paid_on; Due/Overdue tabs → filter by next_due_date
+      const rawDate = activeTab === 'paid' ? b.last_paid_on : b.next_due_date;
+      const d = rawDate ? rawDate.slice(0, 10) : null;
+      if (!d) dateOk = false;
+      else {
+        if (dateFrom && d < dateFrom) dateOk = false;
+        if (dateTo   && d > dateTo)   dateOk = false;
+      }
     }
     return statusOk && planOk && dateOk;
   });
@@ -111,9 +115,14 @@ export default function BillingPage() {
 
         {/* Right controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {/* Date range */}
+          {/* Date range — filters last_paid_on for Paid tab, next_due_date for others */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <CalendarDays size={13} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <CalendarDays size={13} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                {activeTab === 'paid' ? 'Paid on' : 'Due on'}
+              </span>
+            </div>
             <input
               type="date"
               className="input"
