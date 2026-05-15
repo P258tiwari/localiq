@@ -472,8 +472,8 @@ function AIProfileTab({ clientId, client, onGoToKeywords }) {
 
       {r && !loading && (
         <>
-          {/* Business identity fields */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
+          {/* Business identity fields — 70/30 on tablet+, stacked on mobile */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14 }} className="ai-70-30">
             <CopyField label="Business SEO Name" text={r.suggested_business_name} section="business_name" />
             <CopyField label="Business Primary Category" text={r.suggested_category_primary} />
           </div>
