@@ -1463,7 +1463,7 @@ function KeywordsTab({ clientId }) {
               <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>AI Generated Keywords</span>
                 <span style={{ fontSize: 11, background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid rgba(108,62,244,0.2)', borderRadius: 20, padding: '1px 8px' }}>
-                  {aiKeywords.length}
+                  {aiKeywords.filter(k => k.selected).length}
                 </span>
               </div>
               {/* Table header */}
