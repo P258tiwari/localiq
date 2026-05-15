@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { FileText, Tag, CreditCard, CalendarDays, MapPin, ExternalLink, AlertCircle } from 'lucide-react';
+import { FileText, Tag, CreditCard, CalendarDays, MapPin, ExternalLink, AlertCircle, X, Image } from 'lucide-react';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -30,59 +31,216 @@ const STATUS_META = {
   failed:     { label: 'Failed',    bg: '#fef2f2', color: '#ef4444' },
 };
 
-function PostCard({ post }) {
+/* ── Post Detail Modal ─────────────────────────────────────────────────── */
+function PostModal({ post, onClose }) {
+  const tc = POST_TYPE_COLOR[post.post_type] || POST_TYPE_COLOR.update;
+  const sm = STATUS_META[post.status] || STATUS_META.draft;
+
+  useEffect(() => {
+    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+  }, [onClose]);
+
+  return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16,
+      }}
+    >
+      <div style={{
+        background: '#fff', borderRadius: 16, width: '100%', maxWidth: 520,
+        maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 24px 60px rgba(0,0,0,0.3)',
+        animation: 'pop-in 0.18s ease',
+      }}>
+        {/* Image */}
+        {post.image_url && (
+          <div style={{ position: 'relative' }}>
+            <img
+              src={post.image_url}
+              alt=""
+              style={{ width: '100%', maxHeight: 280, objectFit: 'cover', borderRadius: '16px 16px 0 0', display: 'block' }}
+              onError={e => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <button
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: 12, right: 12,
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(0,0,0,0.5)', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
+              }}
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
+        <div style={{ padding: '20px 24px 24px' }}>
+          {/* Close button (no image case) */}
+          {!post.image_url && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 2 }}>
+                <X size={18} />
+              </button>
+            </div>
+          )}
+
+          {/* Badges row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '3px 10px', borderRadius: 20, background: tc.bg, color: tc.color }}>
+              {post.post_type}
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: sm.bg, color: sm.color }}>
+              {sm.label}
+            </span>
+            <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 'auto' }}>
+              {fmtDate(post.published_at || post.scheduled_at)}
+            </span>
+          </div>
+
+          {/* Title */}
+          {post.title && (
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#111827', marginBottom: 12, lineHeight: 1.35 }}>
+              {post.title}
+            </h2>
+          )}
+
+          {/* Content */}
+          <p style={{ fontSize: 14, color: '#374151', lineHeight: 1.75, whiteSpace: 'pre-line', margin: 0 }}>
+            {post.content}
+          </p>
+
+          {/* Event dates */}
+          {(post.event_start || post.event_end) && (
+            <div style={{ marginTop: 16, padding: '12px 14px', background: '#f0fdf4', borderRadius: 8, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              {post.event_start && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Event Start</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{fmtDate(post.event_start)}</div>
+                </div>
+              )}
+              {post.event_end && (
+                <div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Event End</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{fmtDate(post.event_end)}</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Offer coupon */}
+          {post.offer_coupon && (
+            <div style={{ marginTop: 16, padding: '10px 14px', background: '#fefce8', border: '1px dashed #ca8a04', borderRadius: 8 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: '#ca8a04', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Coupon Code</div>
+              <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: '#111827', letterSpacing: '0.1em' }}>{post.offer_coupon}</div>
+              {post.offer_terms && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>{post.offer_terms}</div>}
+            </div>
+          )}
+
+          {/* CTA */}
+          {post.call_to_action && post.cta_url && (
+            <a
+              href={post.cta_url}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                marginTop: 20, padding: '11px 20px', borderRadius: 10,
+                background: '#6c3ef4', color: '#fff',
+                fontSize: 13, fontWeight: 600, textDecoration: 'none',
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              {post.call_to_action} <ExternalLink size={13} />
+            </a>
+          )}
+        </div>
+      </div>
+
+      <style>{`@keyframes pop-in { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }`}</style>
+    </div>
+  );
+}
+
+/* ── Post Card (clickable) ─────────────────────────────────────────────── */
+function PostCard({ post, onClick }) {
   const tc = POST_TYPE_COLOR[post.post_type] || POST_TYPE_COLOR.update;
   const sm = STATUS_META[post.status] || STATUS_META.draft;
   const dateStr = fmtDate(post.published_at || post.scheduled_at);
+
   return (
-    <div style={{
-      background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12,
-      overflow: 'hidden', transition: 'box-shadow 0.15s',
-    }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.08)'}
-      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+    <div
+      onClick={onClick}
+      style={{
+        background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12,
+        overflow: 'hidden', cursor: 'pointer',
+        transition: 'box-shadow 0.15s, transform 0.15s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
     >
-      {post.image_url && (
+      {/* Thumbnail */}
+      {post.image_url ? (
         <img
           src={post.image_url}
           alt=""
-          style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }}
           onError={e => { e.currentTarget.style.display = 'none'; }}
         />
+      ) : (
+        <div style={{ width: '100%', height: 80, background: 'linear-gradient(135deg,#ede9fe,#f3f4f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Image size={28} style={{ color: '#c4b5fd' }} />
+        </div>
       )}
-      <div style={{ padding: '14px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 8, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '2px 8px', borderRadius: 20, background: tc.bg, color: tc.color }}>
+
+      <div style={{ padding: '12px 14px' }}>
+        {/* Badges + date */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 6, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 5 }}>
+            <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '2px 7px', borderRadius: 20, background: tc.bg, color: tc.color }}>
               {post.post_type}
             </span>
-            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: sm.bg, color: sm.color }}>
+            <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 20, background: sm.bg, color: sm.color }}>
               {sm.label}
             </span>
           </div>
-          <span style={{ fontSize: 11, color: '#9ca3af' }}>{dateStr}</span>
+          <span style={{ fontSize: 10, color: '#9ca3af' }}>{dateStr}</span>
         </div>
+
+        {/* Title */}
         {post.title && (
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#111827', marginBottom: 6, lineHeight: 1.35 }}>{post.title}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginBottom: 5, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            {post.title}
+          </div>
         )}
-        <div style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{post.content}</div>
-        {post.call_to_action && post.cta_url && (
-          <a
-            href={post.cta_url}
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 12, fontSize: 12, fontWeight: 600, color: '#6c3ef4', textDecoration: 'none' }}
-          >
-            {post.call_to_action} <ExternalLink size={11} />
-          </a>
-        )}
+
+        {/* Content preview */}
+        <div style={{ fontSize: 12, color: '#6b7280', lineHeight: 1.55, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+          {post.content}
+        </div>
+
+        {/* Tap hint */}
+        <div style={{ marginTop: 10, fontSize: 10, color: '#a78bfa', fontWeight: 600, textAlign: 'right' }}>
+          Tap to view →
+        </div>
       </div>
     </div>
   );
 }
 
+/* ── Main Page ─────────────────────────────────────────────────────────── */
 export default function PublicClientPage() {
   const { token } = useParams();
+  const [activePost, setActivePost] = useState(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['public-client', token],
@@ -109,6 +267,10 @@ export default function PublicClientPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f3f4f6', fontFamily: 'Inter, system-ui, sans-serif' }}>
+
+      {/* Post detail modal */}
+      {activePost && <PostModal post={activePost} onClose={() => setActivePost(null)} />}
+
       {/* Header */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '16px 24px' }}>
         <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -136,11 +298,12 @@ export default function PublicClientPage() {
       </div>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px 48px' }}>
+
         {/* Plan + Next payment */}
         {billing && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
             <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CreditCard size={16} style={{ color: '#6c3ef4' }} />
               </div>
               <div>
@@ -150,7 +313,7 @@ export default function PublicClientPage() {
               </div>
             </div>
             <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CalendarDays size={16} style={{ color: '#ca8a04' }} />
               </div>
               <div>
@@ -178,10 +341,7 @@ export default function PublicClientPage() {
             </div>
             <div style={{ padding: '14px 20px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {keywords.map((k, i) => (
-                <span key={i} style={{
-                  fontSize: 12, fontWeight: 500, padding: '5px 12px', borderRadius: 20,
-                  background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb',
-                }}>
+                <span key={i} style={{ fontSize: 12, fontWeight: 500, padding: '5px 12px', borderRadius: 20, background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb' }}>
                   {k.keyword}
                   {k.volume ? <span style={{ color: '#9ca3af', marginLeft: 5 }}>· {k.volume.toLocaleString('en-IN')}</span> : null}
                 </span>
@@ -201,13 +361,16 @@ export default function PublicClientPage() {
               {posts.length}
             </span>
           </div>
+
           {posts.length === 0 ? (
             <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '48px 24px', textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>
               No posts this month yet
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 16 }}>
-              {posts.map(p => <PostCard key={p.id} post={p} />)}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 14 }}>
+              {posts.map(p => (
+                <PostCard key={p.id} post={p} onClick={() => setActivePost(p)} />
+              ))}
             </div>
           )}
         </div>
