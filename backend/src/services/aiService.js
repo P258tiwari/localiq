@@ -295,13 +295,13 @@ Return a JSON array of EXACTLY 10 post objects:
     "target_service": "Which service or product this post promotes",
     "target_area": "Which city or area this targets",
     "image_prompt": "Detailed DALL-E prompt: photorealistic, professional, 1200x900, [business context], Indian setting, no text, no typography, no words anywhere in the image",
-    "post_type": "update|offer|event|product",
+    "post_type": "update",
     "suggested_date": "${targetYear}-${String(targetMonth).padStart(2,'0')}-DD",
     "suggested_time": "HH:MM"
   }
 ]
 
-CRITICAL: post_description must be 1000-1500 characters with 3-4 paragraphs separated by blank lines. Spread dates evenly: roughly every 3 days. Vary post types. Suggested time should match business category (e.g. restaurants: 11:00, services: 09:30, retail: 18:00).`.trim();
+CRITICAL: post_description must be 1000-1500 characters with 3-4 paragraphs separated by blank lines. Spread dates evenly: roughly every 3 days. All posts must be type "update". Suggested time should match business category (e.g. restaurants: 11:00, services: 09:30, retail: 18:00).`.trim();
 
   try {
     const text   = await ask(prompt, 8192, 'generateMonthlyPosts');

@@ -149,7 +149,7 @@ export async function generatePosts(req, res, next) {
           : null;
         insert.run(
           id, client_id,
-          p.post_type || 'update',
+          'update',
           p.post_heading || p.post_title || null,
           p.post_description,
           p.cta_text || 'LEARN_MORE',
