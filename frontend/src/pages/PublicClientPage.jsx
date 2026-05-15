@@ -316,7 +316,6 @@ export default function PublicClientPage() {
               {keywords.map((k, i) => (
                 <span key={i} style={{ fontSize: 12, fontWeight: 500, padding: '5px 12px', borderRadius: 20, background: '#f3f4f6', color: '#374151', border: '1px solid #e5e7eb' }}>
                   {k.keyword}
-                  {k.volume ? <span style={{ color: '#9ca3af', marginLeft: 5 }}>· {k.volume.toLocaleString('en-IN')}</span> : null}
                 </span>
               ))}
             </div>
