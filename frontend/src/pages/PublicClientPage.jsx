@@ -117,33 +117,6 @@ function PostModal({ post, onClose }) {
             {post.content}
           </p>
 
-          {/* Event dates */}
-          {(post.event_start || post.event_end) && (
-            <div style={{ marginTop: 16, padding: '12px 14px', background: '#f0fdf4', borderRadius: 8, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              {post.event_start && (
-                <div>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Event Start</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{fmtDate(post.event_start)}</div>
-                </div>
-              )}
-              {post.event_end && (
-                <div>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Event End</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>{fmtDate(post.event_end)}</div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Offer coupon */}
-          {post.offer_coupon && (
-            <div style={{ marginTop: 16, padding: '10px 14px', background: '#fefce8', border: '1px dashed #ca8a04', borderRadius: 8 }}>
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#ca8a04', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 2 }}>Coupon Code</div>
-              <div style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: '#111827', letterSpacing: '0.1em' }}>{post.offer_coupon}</div>
-              {post.offer_terms && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 4 }}>{post.offer_terms}</div>}
-            </div>
-          )}
-
           {/* CTA */}
           {post.call_to_action && post.cta_url && (
             <a

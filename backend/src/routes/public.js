@@ -21,7 +21,7 @@ r.get('/:token', (req, res) => {
   const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
   const monthEnd   = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-31`;
   const posts = db.prepare(
-    `SELECT id, title, content, image_url, post_type, status, published_at, scheduled_at, call_to_action, cta_url, event_start, event_end, offer_coupon, offer_terms
+    `SELECT id, title, content, image_url, post_type, status, published_at, scheduled_at, call_to_action, cta_url
      FROM gbp_posts
      WHERE client_id = ?
        AND COALESCE(published_at, scheduled_at, created_at) >= ?
