@@ -23,8 +23,16 @@ const POST_TYPE_COLOR = {
   product: { bg: '#fdf4ff', color: '#9333ea' },
 };
 
+const STATUS_META = {
+  published: { label: 'Published', bg: '#f0fdf4', color: '#16a34a' },
+  scheduled:  { label: 'Scheduled', bg: '#fefce8', color: '#ca8a04' },
+  draft:      { label: 'Draft',     bg: '#f3f4f6', color: '#6b7280' },
+  failed:     { label: 'Failed',    bg: '#fef2f2', color: '#ef4444' },
+};
+
 function PostCard({ post }) {
   const tc = POST_TYPE_COLOR[post.post_type] || POST_TYPE_COLOR.update;
+  const sm = STATUS_META[post.status] || STATUS_META.draft;
   const dateStr = fmtDate(post.published_at || post.scheduled_at);
   return (
     <div style={{
@@ -43,10 +51,15 @@ function PostCard({ post }) {
         />
       )}
       <div style={{ padding: '14px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 8 }}>
-          <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '2px 8px', borderRadius: 20, background: tc.bg, color: tc.color }}>
-            {post.post_type}
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '2px 8px', borderRadius: 20, background: tc.bg, color: tc.color }}>
+              {post.post_type}
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 20, background: sm.bg, color: sm.color }}>
+              {sm.label}
+            </span>
+          </div>
           <span style={{ fontSize: 11, color: '#9ca3af' }}>{dateStr}</span>
         </div>
         {post.title && (
@@ -181,14 +194,16 @@ export default function PublicClientPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <FileText size={15} style={{ color: '#6c3ef4' }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Recent Posts</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>
+              {new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })} Posts
+            </span>
             <span style={{ fontSize: 11, background: '#ede9fe', color: '#6c3ef4', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
               {posts.length}
             </span>
           </div>
           {posts.length === 0 ? (
             <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '48px 24px', textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>
-              No posts yet
+              No posts this month yet
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 16 }}>

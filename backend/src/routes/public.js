@@ -16,14 +16,19 @@ r.get('/:token', (req, res) => {
     'SELECT plan_name, monthly_amount, next_due_date, payment_status, start_date FROM client_billing WHERE client_id = ?'
   ).get(client.id);
 
-  // Posts: published, most recent 20
+  // Posts: all statuses, current month only, latest 10
+  const now = new Date();
+  const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+  const monthEnd   = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-31`;
   const posts = db.prepare(
-    `SELECT id, title, content, image_url, post_type, published_at, scheduled_at, call_to_action, cta_url
+    `SELECT id, title, content, image_url, post_type, status, published_at, scheduled_at, call_to_action, cta_url
      FROM gbp_posts
-     WHERE client_id = ? AND status IN ('published','scheduled')
-     ORDER BY COALESCE(published_at, scheduled_at) DESC
-     LIMIT 20`
-  ).all(client.id);
+     WHERE client_id = ?
+       AND COALESCE(published_at, scheduled_at, created_at) >= ?
+       AND COALESCE(published_at, scheduled_at, created_at) <= ?
+     ORDER BY COALESCE(published_at, scheduled_at, created_at) DESC
+     LIMIT 10`
+  ).all(client.id, monthStart, monthEnd);
 
   // Selected keywords only
   const keywords = db.prepare(
