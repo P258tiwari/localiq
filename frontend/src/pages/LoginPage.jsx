@@ -9,12 +9,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [errors, setErrors]     = useState({});
   const { login } = useAuthStore();
   const navigate  = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !password) return toast.error('Enter email and password');
+    const errs = {};
+    if (!email.trim())    errs.email    = 'Email is required';
+    if (!password.trim()) errs.password = 'Password is required';
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setErrors({});
     setLoading(true);
     try {
       await login(email, password);
@@ -80,13 +85,13 @@ export default function LoginPage() {
               <label className="label">Email address</label>
               <input
                 type="email"
-                className="input"
+                className={`input ${errors.email ? 'input-error' : ''}`}
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: undefined })); }}
                 placeholder="admin@ampwake.com"
                 autoComplete="email"
-                required
               />
+              {errors.email && <div className="field-error" style={{ fontSize: 11 }}>⚠ {errors.email}</div>}
             </div>
 
             <div className="field">
@@ -94,13 +99,12 @@ export default function LoginPage() {
               <div style={{ position: 'relative' }}>
                 <input
                   type={showPw ? 'text' : 'password'}
-                  className="input"
+                  className={`input ${errors.password ? 'input-error' : ''}`}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={e => { setPassword(e.target.value); setErrors(p => ({ ...p, password: undefined })); }}
                   placeholder="Enter your password"
                   autoComplete="current-password"
                   style={{ paddingRight: 40 }}
-                  required
                 />
                 <button
                   type="button"
@@ -114,6 +118,7 @@ export default function LoginPage() {
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
+              {errors.password && <div className="field-error" style={{ fontSize: 11 }}>⚠ {errors.password}</div>}
             </div>
 
             <button

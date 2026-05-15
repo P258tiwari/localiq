@@ -84,10 +84,10 @@ export default function ClientsPage() {
   const [page, setPage]     = useState(1);
   const perPage = 8;
 
-  const { data: apiData, isLoading } = useQuery({
+  const { data: apiData, isLoading, isError, refetch } = useQuery({
     queryKey: ['clients', search, filter],
     queryFn: () => api.get('/clients', { params: { search: search || undefined, status: filter === 'All' ? undefined : filter.toLowerCase(), limit: 100 } }).then(r => r.data),
-    retry: 0,
+    retry: 1,
   });
 
   const raw = apiData?.clients ?? [];
@@ -182,8 +182,18 @@ export default function ClientsPage() {
         </div>
       </div>
 
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state">
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load clients</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
       {/* Desktop table */}
-      <div className="card tbl-desktop">
+      {!isError && <div className="card tbl-desktop">
         <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr 100px 90px 36px', gap: 12, padding: '10px 20px', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           <div /><div>Business</div><div>Status</div><div>Plan</div><div />
         </div>
@@ -194,9 +204,11 @@ export default function ClientsPage() {
             ))
           : paged.length === 0
             ? (
-                <div style={{ padding: '60px 0', textAlign: 'center' }}>
-                  <Building2 size={36} style={{ color: 'var(--text-muted)', margin: '0 auto 12px' }} />
-                  <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>No clients found</div>
+                <div className="empty-state">
+                  <div className="empty-state-emoji">🏢</div>
+                  <div className="empty-state-title">{search ? 'No matching clients' : filter !== 'All' ? `No ${filter.toLowerCase()} clients` : 'No clients yet'}</div>
+                  <div className="empty-state-sub">{search ? 'Try a different name or city' : 'Add your first client to get started'}</div>
+                  {!search && filter === 'All' && <Link to="/clients/new" className="btn-primary" style={{ marginTop: 8 }}>Add First Client</Link>}
                 </div>
               )
             : paged.map(c => (
@@ -227,22 +239,24 @@ export default function ClientsPage() {
                 </Link>
               ))
         }
-      </div>
+      </div>}
 
       {/* Mobile card list */}
-      <div className="tbl-mobile" style={{ gap: 10 }}>
+      {!isError && <div className="tbl-mobile" style={{ gap: 10 }}>
         {isLoading
           ? [...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: 130, borderRadius: 12 }} />)
           : paged.length === 0
             ? (
-                <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                  <Building2 size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 10px' }} />
-                  <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>No clients found</div>
+                <div className="empty-state">
+                  <div className="empty-state-emoji">🏢</div>
+                  <div className="empty-state-title">{search ? 'No matching clients' : filter !== 'All' ? `No ${filter.toLowerCase()} clients` : 'No clients yet'}</div>
+                  <div className="empty-state-sub">{search ? 'Try a different name or city' : 'Add your first client to get started'}</div>
+                  {!search && filter === 'All' && <Link to="/clients/new" className="btn-primary" style={{ marginTop: 8 }}>Add First Client</Link>}
                 </div>
               )
             : paged.map(c => <ClientCard key={c.id} c={c} />)
         }
-      </div>
+      </div>}
 
       {/* Pagination */}
       {pages > 1 && (

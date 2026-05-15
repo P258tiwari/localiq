@@ -6,7 +6,7 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { format, subDays } from 'date-fns';
-import { Plus } from 'lucide-react';
+import { Plus, AlertCircle } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import Modal from '../components/Modal';
@@ -18,12 +18,20 @@ function EntryModal({ clientId, onClose, onSaved }) {
     clicks_website: '', clicks_phone: '', clicks_directions: '',
     photo_views: '', new_reviews: '', avg_rating: ''
   });
+  const [errors, setErrors] = useState({});
 
   const mut = useMutation({
     mutationFn: data => api.post('/analytics/client', { client_id: clientId, ...data }),
     onSuccess: () => { toast.success('Data saved'); onSaved(); },
-    onError:   e  => toast.error(e.response?.data?.error || 'Failed')
+    onError: e => toast.error(e.response?.data?.error || 'Failed to save')
   });
+
+  function submit() {
+    const e = {};
+    if (!form.date) e.date = 'Date is required';
+    if (Object.keys(e).length) { setErrors(e); return; }
+    mut.mutate(form);
+  }
 
   const F = ({ label, field }) => (
     <div className="field">
@@ -34,13 +42,14 @@ function EntryModal({ clientId, onClose, onSaved }) {
   );
 
   return (
-    <div className="p-5 space-y-4">
+    <div style={{ padding: '20px 20px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="field">
-        <label className="label">Date</label>
-        <input type="date" className="input" value={form.date}
+        <label className="label">Date *</label>
+        <input type="date" className={`input ${errors.date ? 'input-error' : ''}`} value={form.date}
           onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+        {errors.date && <div className="field-error"><AlertCircle size={11} />{errors.date}</div>}
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <F label="Search Views"      field="views_search" />
         <F label="Maps Views"        field="views_maps" />
         <F label="Website Clicks"    field="clicks_website" />
@@ -54,10 +63,9 @@ function EntryModal({ clientId, onClose, onSaved }) {
             value={form.avg_rating} onChange={e => setForm(f => ({ ...f, avg_rating: e.target.value }))} />
         </div>
       </div>
-      <div className="flex gap-2">
-        <button className="btn-secondary flex-1" onClick={onClose}>Cancel</button>
-        <button className="btn-primary flex-1" disabled={mut.isPending}
-          onClick={() => mut.mutate(form)}>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        <button className="btn-ghost" style={{ flex: 1 }} onClick={onClose}>Cancel</button>
+        <button className="btn-primary" style={{ flex: 1 }} disabled={mut.isPending} onClick={submit}>
           {mut.isPending ? 'Saving…' : 'Save Data'}
         </button>
       </div>
@@ -79,7 +87,7 @@ export default function AnalyticsPage() {
     queryFn: () => api.get('/clients', { params: { limit: 100 } }).then(r => r.data)
   });
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['analytics', clientId, days],
     queryFn: () => api.get('/analytics/client', {
       params: { client_id: clientId, start_date: startDate, end_date: endDate }
@@ -95,53 +103,81 @@ export default function AnalyticsPage() {
 
   const t = data?.totals ?? {};
 
+  const cardStyle = { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 20px' };
+  const headStyle = { fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 16 };
+
   return (
-    <div className="page py-6">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="page-title">Analytics</h1>
-        <div className="flex gap-2">
-          {clientId && (
-            <button className="btn-secondary text-sm" onClick={() => setEntryModal(true)}>
-              <Plus className="w-4 h-4" /> Log Data
-            </button>
-          )}
+    <div className="page" style={{ paddingTop: 24, paddingBottom: 40 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>Analytics</div>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Track GBP performance across clients</div>
         </div>
+        {clientId && (
+          <button className="btn-ghost" style={{ gap: 6, fontSize: 13 }} onClick={() => setEntryModal(true)}>
+            <Plus size={14} /> Log Data
+          </button>
+        )}
       </div>
 
       {/* Selectors */}
-      <div className="card p-3.5 mb-5 flex flex-wrap gap-3">
-        <select className="input w-52" value={clientId} onChange={e => setClientId(e.target.value)}>
+      <div className="card" style={{ padding: '14px 16px', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        <select className="input" style={{ width: 200 }} value={clientId} onChange={e => setClientId(e.target.value)}>
           <option value="">Select client…</option>
           {cData?.clients?.map(c => <option key={c.id} value={c.id}>{c.business_name}</option>)}
         </select>
-        <select className="input w-36" value={days} onChange={e => setDays(Number(e.target.value))}>
+        <select className="input" style={{ width: 140 }} value={days} onChange={e => setDays(Number(e.target.value))}>
           <option value={7}>Last 7 days</option>
           <option value={30}>Last 30 days</option>
           <option value={90}>Last 90 days</option>
         </select>
       </div>
 
-      {!clientId ? (
-        <div className="card py-16 text-center text-gray-400 text-sm">
-          Select a client to view analytics
+      {/* No client selected */}
+      {!clientId && (
+        <div className="card empty-state">
+          <div className="empty-state-emoji">📈</div>
+          <div className="empty-state-title">Select a client</div>
+          <div className="empty-state-sub">Choose a client above to view their GBP analytics</div>
         </div>
-      ) : isLoading ? (
-        <div className="card py-16 text-center text-gray-400 text-sm animate-pulse">Loading…</div>
-      ) : (
+      )}
+
+      {/* Loading skeleton */}
+      {clientId && isLoading && (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
+            {[...Array(4)].map((_, i) => <div key={i} className="skeleton card" style={{ height: 80 }} />)}
+          </div>
+          <div className="skeleton card" style={{ height: 260, marginBottom: 16 }} />
+          <div className="skeleton card" style={{ height: 260 }} />
+        </>
+      )}
+
+      {/* Error state */}
+      {clientId && isError && (
+        <div className="card error-state">
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load analytics</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
+      {/* Data */}
+      {clientId && !isLoading && !isError && (
         <>
           {/* Summary tiles */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 20 }}>
             {[
-              { label: 'Search Views',   value: t.total_views_search,     color: 'text-blue-600' },
-              { label: 'Maps Views',     value: t.total_views_maps,       color: 'text-green-600' },
-              { label: 'Website Clicks', value: t.total_clicks_website,   color: 'text-purple-600' },
-              { label: 'New Reviews',    value: t.total_new_reviews,      color: 'text-yellow-600' }
+              { label: 'Search Views',   value: t.total_views_search,   color: 'var(--accent-text)'  },
+              { label: 'Maps Views',     value: t.total_views_maps,     color: 'var(--green-text)'   },
+              { label: 'Website Clicks', value: t.total_clicks_website, color: '#7C3AED'             },
+              { label: 'New Reviews',    value: t.total_new_reviews,    color: 'var(--yellow-text)'  },
             ].map(({ label, value, color }) => (
-              <div key={label} className="card p-4">
-                <p className="text-xs text-gray-500">{label}</p>
-                <p className={`text-2xl font-bold mt-1 ${color}`}>
-                  {(value ?? 0).toLocaleString()}
-                </p>
+              <div key={label} style={{ ...cardStyle }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color, marginTop: 4 }}>{(value ?? 0).toLocaleString('en-IN')}</div>
               </div>
             ))}
           </div>
@@ -149,72 +185,73 @@ export default function AnalyticsPage() {
           {data?.analytics?.length > 0 ? (
             <>
               {/* Views chart */}
-              <div className="card p-5 mb-5">
-                <h2 className="text-sm font-semibold text-gray-900 mb-4">Profile Views</h2>
+              <div style={{ ...cardStyle, marginBottom: 16 }}>
+                <div style={headStyle}>Profile Views</div>
                 <ResponsiveContainer width="100%" height={220}>
                   <LineChart data={data.analytics}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="views_search" stroke="#6366f1" name="Search" dot={false} strokeWidth={2} />
-                    <Line type="monotone" dataKey="views_maps"   stroke="#10b981" name="Maps"   dot={false} strokeWidth={2} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Line type="monotone" dataKey="views_search" stroke="var(--accent)" name="Search" dot={false} strokeWidth={2} />
+                    <Line type="monotone" dataKey="views_maps"   stroke="var(--green-text)" name="Maps" dot={false} strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
               {/* Clicks chart */}
-              <div className="card p-5 mb-5">
-                <h2 className="text-sm font-semibold text-gray-900 mb-4">Customer Actions</h2>
+              <div style={{ ...cardStyle, marginBottom: 16 }}>
+                <div style={headStyle}>Customer Actions</div>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={data.analytics}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="clicks_website"    fill="#6366f1" name="Website"    radius={[3,3,0,0]} />
-                    <Bar dataKey="clicks_phone"      fill="#10b981" name="Phone"      radius={[3,3,0,0]} />
-                    <Bar dataKey="clicks_directions" fill="#f59e0b" name="Directions" radius={[3,3,0,0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Bar dataKey="clicks_website"    fill="var(--accent)"       name="Website"    radius={[3,3,0,0]} />
+                    <Bar dataKey="clicks_phone"      fill="var(--green-text)"   name="Phone"      radius={[3,3,0,0]} />
+                    <Bar dataKey="clicks_directions" fill="var(--yellow-text)"  name="Directions" radius={[3,3,0,0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </>
           ) : (
-            <div className="card py-12 text-center text-sm text-gray-400 mb-5">
-              No analytics data for this period.{' '}
-              <button className="text-brand-600 hover:underline" onClick={() => setEntryModal(true)}>
-                Log some data
-              </button>
+            <div className="card empty-state" style={{ marginBottom: 16 }}>
+              <div className="empty-state-emoji">📉</div>
+              <div className="empty-state-title">No analytics data for this period</div>
+              <div className="empty-state-sub">Log performance data manually or connect your GBP account</div>
+              <button className="btn-primary" style={{ marginTop: 8 }} onClick={() => setEntryModal(true)}>Log Data</button>
             </div>
           )}
 
           {/* Review distribution */}
           {reviewStats?.distribution?.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="card p-5">
-                <h2 className="text-sm font-semibold text-gray-900 mb-4">Review Distribution</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+              <div style={cardStyle}>
+                <div style={headStyle}>Review Distribution</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={reviewStats.distribution}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="rating" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#6366f1" radius={[4,4,0,0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="rating" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="count" fill="var(--accent)" radius={[4,4,0,0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="card p-5">
-                <h2 className="text-sm font-semibold text-gray-900 mb-4">Monthly Review Trend</h2>
+              <div style={cardStyle}>
+                <div style={headStyle}>Monthly Review Trend</div>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart data={[...( reviewStats.monthly ?? [])].reverse()}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="count"      stroke="#6366f1" name="Reviews"    dot={false} />
-                    <Line type="monotone" dataKey="avg_rating" stroke="#f59e0b" name="Avg Rating" dot={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
+                    <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 }} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Line type="monotone" dataKey="count"      stroke="var(--accent)"       name="Reviews"    dot={false} />
+                    <Line type="monotone" dataKey="avg_rating" stroke="var(--yellow-text)"  name="Avg Rating" dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

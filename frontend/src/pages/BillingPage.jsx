@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CreditCard, X, Download, CalendarDays } from 'lucide-react';
+import { CreditCard, X, Download, CalendarDays, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import StatCard from '../components/ui/StatCard';
 import { downloadCSV } from '../utils/exportCSV';
@@ -18,6 +18,11 @@ function fmt(n) {
   return '₹' + Number(n).toLocaleString('en-IN');
 }
 
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 
 const COL = '1fr 110px 130px 110px 120px 120px';
 
@@ -33,7 +38,7 @@ export default function BillingPage() {
   const [dateFrom, setDateFrom]     = useState('');
   const [dateTo, setDateTo]         = useState('');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['billing-list'],
     queryFn: () => api.get('/billing').then(r => r.data),
     staleTime: 30_000,
@@ -143,6 +148,16 @@ export default function BillingPage() {
         </div>
       </div>
 
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state" style={{ marginBottom: 16 }}>
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load billing data</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
       {/* Table — scrollable on small screens */}
       <div className="card" style={{ overflowX: 'auto' }}>
         <div style={{ minWidth: 700 }}>
@@ -182,8 +197,8 @@ export default function BillingPage() {
                 <div style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, background: meta.bg, color: meta.color }}>{meta.label}</span>
                 </div>
-                <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)' }}>{b.last_paid_on ? new Date(b.last_paid_on).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</div>
-                <div style={{ textAlign: 'center', fontSize: 12, color: b.payment_status === 'overdue' ? 'var(--red-text)' : 'var(--text-secondary)' }}>{b.next_due_date ? new Date(b.next_due_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</div>
+                <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-secondary)' }}>{fmtDate(b.last_paid_on)}</div>
+                <div style={{ textAlign: 'center', fontSize: 12, color: b.payment_status === 'overdue' ? 'var(--red-text)' : 'var(--text-secondary)' }}>{fmtDate(b.next_due_date)}</div>
               </div>
             );
           })}

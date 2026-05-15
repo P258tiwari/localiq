@@ -1770,7 +1770,7 @@ function BillingTab({ clientId, billing }) {
   const totalEarned = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
 
   function fmt(v) { return v ? `₹${Number(v).toLocaleString('en-IN')}` : '—'; }
-  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'; }
+  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'; }
 
   // Smart status label + colors based on next_due_date
   function getStatusBadge() {
@@ -1949,7 +1949,7 @@ function NotesTab({ clientId }) {
   function fmtDate(str) {
     if (!str) return '';
     const d = new Date(str.replace(' ', 'T') + 'Z');
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
       + ' · ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   }
 
@@ -2122,7 +2122,7 @@ export default function ClientOverviewPage() {
   const [deleting,    setDeleting]   = useState(false);
   const [toggling,    setToggling]   = useState(false);
 
-  const { data: clientData, isLoading } = useQuery({
+  const { data: clientData, isLoading, isError, refetch: refetchClient } = useQuery({
     queryKey: ['client', id],
     queryFn:  () => api.get(`/clients/${id}`).then(r => r.data),
     enabled:  !!id,
@@ -2182,12 +2182,25 @@ export default function ClientOverviewPage() {
         />
       )}
 
-      <button onClick={() => navigate('/clients')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20, fontSize: 13 }}>
+      <button onClick={() => navigate('/clients')} className="btn-ghost" style={{ gap: 6, marginBottom: 20, fontSize: 13, height: 34 }}>
         <ArrowLeft size={14} /> Back to Clients
       </button>
 
-      {/* Header card */}
-      {isLoading ? (
+      {/* Error state for client load */}
+      {isError && (
+        <div className="card error-state">
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load client</div>
+          <div className="error-state-sub">The client may not exist or there was a connection issue</div>
+          <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+            <button className="btn-ghost" onClick={() => navigate('/clients')}>Back to Clients</button>
+            <button className="btn-primary" onClick={() => refetchClient()}>Retry</button>
+          </div>
+        </div>
+      )}
+
+      {/* Header card + tabs — hidden when error */}
+      {!isError && isLoading ? (
         <div className="card" style={{ padding: '20px 24px', marginBottom: 20 }}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             <div className="skeleton" style={{ width: 52, height: 52, borderRadius: 12, flexShrink: 0 }} />
@@ -2284,23 +2297,25 @@ export default function ClientOverviewPage() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="tab-bar-scroll" style={{ marginBottom: 20 }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`tab ${tab === t.id ? 'tab-active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-            <t.icon size={13} />{t.label}
-          </button>
-        ))}
-      </div>
+      {/* Tabs — only shown when client loaded */}
+      {!isError && !isLoading && <>
+        <div className="tab-bar-scroll" style={{ marginBottom: 20 }}>
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)} className={`tab ${tab === t.id ? 'tab-active' : ''}`} style={{ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+              <t.icon size={13} />{t.label}
+            </button>
+          ))}
+        </div>
 
-      {tab === 'overview'  && <OverviewTab client={client} billing={billing} onFieldEdit={setInlineEdit} />}
-      {inlineEdit && <InlineEditPopup config={inlineEdit} onSave={handleInlineSave} onClose={() => setInlineEdit(null)} />}
-      {tab === 'ai'        && <AIProfileTab clientId={id} client={client} onGoToKeywords={() => setTab('keywords')} />}
-      {tab === 'posts'     && <PostsTab clientId={id} />}
-      {tab === 'keywords'  && <KeywordsTab clientId={id} />}
-      {tab === 'billing'   && <BillingTab clientId={id} billing={billing} />}
-      {tab === 'reviews'   && <ReviewsTab clientId={id} />}
-      {tab === 'notes'     && <NotesTab clientId={id} />}
+        {tab === 'overview'  && <OverviewTab client={client} billing={billing} onFieldEdit={setInlineEdit} />}
+        {inlineEdit && <InlineEditPopup config={inlineEdit} onSave={handleInlineSave} onClose={() => setInlineEdit(null)} />}
+        {tab === 'ai'        && <AIProfileTab clientId={id} client={client} onGoToKeywords={() => setTab('keywords')} />}
+        {tab === 'posts'     && <PostsTab clientId={id} />}
+        {tab === 'keywords'  && <KeywordsTab clientId={id} />}
+        {tab === 'billing'   && <BillingTab clientId={id} billing={billing} />}
+        {tab === 'reviews'   && <ReviewsTab clientId={id} />}
+        {tab === 'notes'     && <NotesTab clientId={id} />}
+      </>}
     </div>
   );
 }

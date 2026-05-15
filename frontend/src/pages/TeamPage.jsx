@@ -277,7 +277,7 @@ function PlaceholderCard({ onAdd }) {
 export default function TeamPage() {
   const [showModal, setShowModal] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: () => api.get('/users').then(r => r.data),
     staleTime: 30_000,
@@ -303,14 +303,24 @@ export default function TeamPage() {
         ))}
       </div>
 
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state" style={{ marginBottom: 16 }}>
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load team members</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
       {/* Team grid — 1 col mobile, 2 col tablet, 3 col desktop */}
-      <div className="rg-team">
+      {!isError && <div className="rg-team">
         {isLoading
           ? [...Array(3)].map((_, i) => <div key={i} className="skeleton card" style={{ height: 220 }} />)
           : users.map(m => <MemberCard key={m.id} member={m} />)
         }
         <PlaceholderCard onAdd={() => setShowModal(true)} />
-      </div>
+      </div>}
 
       {showModal && <AddMemberModal onClose={() => setShowModal(false)} />}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

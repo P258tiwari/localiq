@@ -82,7 +82,7 @@ export default function ReviewsPage() {
     queryFn: () => api.get('/clients', { params: { limit: 100 } }).then(r => r.data)
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['reviews', clientId, rating, isReplied],
     queryFn: () => api.get('/reviews', {
       params: {
@@ -148,6 +148,16 @@ export default function ReviewsPage() {
         </select>
       </div>
 
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state">
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load reviews</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
       {/* Cards */}
       <div className="space-y-3">
         {isLoading ? [...Array(3)].map((_, i) => (
@@ -166,7 +176,7 @@ export default function ReviewsPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-gray-900">{rev.reviewer_name}</span>
                     <span className="text-xs text-gray-400">
-                      {new Date(rev.review_date).toLocaleDateString()}
+                      {new Date(rev.review_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -219,10 +229,12 @@ export default function ReviewsPage() {
           </div>
         ))}
 
-        {!isLoading && !data?.reviews?.length && (
-          <div className="card py-16 text-center">
-            <Star className="w-10 h-10 mx-auto text-gray-200 mb-3" />
-            <p className="text-sm text-gray-400">No reviews found</p>
+        {!isLoading && !isError && !data?.reviews?.length && (
+          <div className="card empty-state">
+            <div className="empty-state-emoji">⭐</div>
+            <div className="empty-state-title">No reviews yet</div>
+            <div className="empty-state-sub">{clientId ? 'No reviews match your filters' : 'Add your first review to track client feedback'}</div>
+            <button className="btn-primary" style={{ marginTop: 8 }} onClick={() => setAddModal(true)}>Add Review</button>
           </div>
         )}
       </div>

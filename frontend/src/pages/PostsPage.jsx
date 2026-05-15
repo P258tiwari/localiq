@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, FileText, Pencil, Trash2, Clock } from 'lucide-react';
-import { format } from 'date-fns';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
@@ -22,7 +21,7 @@ export default function PostsPage() {
     queryFn: () => api.get('/clients', { params: { limit: 100 } }).then(r => r.data)
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['posts', clientId, status, postType],
     queryFn: () => api.get('/posts', {
       params: {
@@ -98,7 +97,7 @@ export default function PostsPage() {
                   {p.scheduled_at && (
                     <p className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {format(new Date(p.scheduled_at), 'MMM d, h:mm a')}
+                      {new Date(p.scheduled_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </p>
                   )}
                 </div>
@@ -119,11 +118,22 @@ export default function PostsPage() {
         ))}
       </div>
 
-      {!isLoading && !data?.posts?.length && (
-        <div className="card py-16 text-center">
-          <FileText className="w-10 h-10 mx-auto text-gray-200 mb-3" />
-          <p className="text-sm text-gray-400 mb-4">No posts found</p>
-          <Link to="/posts/new" className="btn-primary">Create your first post</Link>
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state">
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load posts</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
+      {!isLoading && !isError && !data?.posts?.length && (
+        <div className="card empty-state">
+          <div className="empty-state-emoji">📝</div>
+          <div className="empty-state-title">No posts yet</div>
+          <div className="empty-state-sub">{clientId || status || postType ? 'No posts match the selected filters' : 'Create your first GBP post to get started'}</div>
+          <Link to="/posts/new" className="btn-primary" style={{ marginTop: 8 }}>Create Post</Link>
         </div>
       )}
     </div>

@@ -64,6 +64,16 @@ function RevenueChart({ monthlyRevenue }) {
   const [range, setRange] = useState('12M');
   const months = RANGE_OPTS.find(o => o.label === range)?.months ?? 12;
   const data    = (monthlyRevenue ?? []).slice(-months).map(d => ({ ...d, name: monthLabel(d.month) }));
+
+  if (!monthlyRevenue || monthlyRevenue.length === 0) {
+    return (
+      <div className="card empty-state" style={{ padding: '40px 22px' }}>
+        <div className="empty-state-emoji">📊</div>
+        <div className="empty-state-title">No revenue data yet</div>
+        <div className="empty-state-sub">Revenue will appear here once payments are recorded</div>
+      </div>
+    );
+  }
   const total   = data.reduce((s, d) => s + d.revenue, 0);
   const current = new Date().toISOString().slice(0, 7);
   const thisMonth = (monthlyRevenue ?? []).find(d => d.month === current)?.revenue ?? 0;
@@ -229,7 +239,7 @@ function UpcomingPayments({ payments, isLoading }) {
 export default function DashboardPage() {
   const { user } = useAuthStore();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => api.get('/analytics/dashboard').then(r => r.data),
     staleTime: 60_000,
@@ -275,14 +285,26 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Error state */}
+      {isError && (
+        <div className="card error-state" style={{ marginBottom: 24 }}>
+          <div className="error-state-emoji">⚠️</div>
+          <div className="error-state-title">Failed to load dashboard</div>
+          <div className="error-state-sub">Check your connection and try again</div>
+          <button className="btn-ghost" style={{ marginTop: 8 }} onClick={() => refetch()}>Retry</button>
+        </div>
+      )}
+
       {/* Revenue + Upcoming Payments — 60/40 on laptop, stacked below */}
-      <div className="rg-rev">
-        {isLoading
-          ? <div className="skeleton card" style={{ height: 320 }} />
-          : <RevenueChart monthlyRevenue={s.monthly_revenue} />
-        }
-        <UpcomingPayments payments={s.upcoming_payments} isLoading={isLoading} />
-      </div>
+      {!isError && (
+        <div className="rg-rev">
+          {isLoading
+            ? <div className="skeleton card" style={{ height: 320 }} />
+            : <RevenueChart monthlyRevenue={s.monthly_revenue} />
+          }
+          <UpcomingPayments payments={s.upcoming_payments} isLoading={isLoading} />
+        </div>
+      )}
     </div>
   );
 }
