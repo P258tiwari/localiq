@@ -2117,10 +2117,14 @@ export default function ClientOverviewPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState('overview');
   const { isMobile } = useBreakpoint();
-  const [inlineEdit,  setInlineEdit] = useState(null);
-  const [showDelete,  setShowDelete] = useState(false);
-  const [deleting,    setDeleting]   = useState(false);
-  const [toggling,    setToggling]   = useState(false);
+  const [inlineEdit,     setInlineEdit]    = useState(null);
+  const [showDelete,     setShowDelete]    = useState(false);
+  const [deleting,       setDeleting]      = useState(false);
+  const [toggling,       setToggling]      = useState(false);
+  const [showPublicLink, setShowPublicLink] = useState(false);
+  const [publicToken,    setPublicToken]   = useState(null);
+  const [genLoading,     setGenLoading]    = useState(false);
+  const [linkCopied,     setLinkCopied]    = useState(false);
 
   const { data: clientData, isLoading, isError, refetch: refetchClient } = useQuery({
     queryKey: ['client', id],
@@ -2138,6 +2142,31 @@ export default function ClientOverviewPage() {
     ? client.business_name.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()
     : '..';
   const isActive = client?.status === 'active';
+
+  async function openPublicLink() {
+    setShowPublicLink(true);
+    if (publicToken) return;
+    try {
+      const r = await api.get(`/public/token/${id}`);
+      setPublicToken(r.data.token || null);
+    } catch { setPublicToken(null); }
+  }
+
+  async function generatePublicLink() {
+    setGenLoading(true);
+    try {
+      const r = await api.post(`/public/generate/${id}`);
+      setPublicToken(r.data.token);
+    } finally { setGenLoading(false); }
+  }
+
+  function copyPublicLink() {
+    if (!publicToken) return;
+    const url = `${window.location.origin}/public/${publicToken}`;
+    navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2500);
+  }
 
   async function handleToggleStatus() {
     if (!client || toggling) return;
@@ -2180,6 +2209,62 @@ export default function ClientOverviewPage() {
           onClose={() => setShowDelete(false)}
           onConfirm={handleDelete}
         />
+      )}
+
+      {/* Public Link Modal */}
+      {showPublicLink && (
+        <Portal>
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(3px)', padding: 16 }}
+            onClick={e => { if (e.target === e.currentTarget) setShowPublicLink(false); }}
+          >
+            <div className="card" style={{ width: '100%', maxWidth: 440, padding: '24px 24px 20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Client Share Link</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Read-only · No login required</div>
+                </div>
+                <button onClick={() => setShowPublicLink(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 2 }}><X size={15} /></button>
+              </div>
+
+              {publicToken ? (
+                <>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>Share URL</div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <div style={{ flex: 1, background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: 'var(--text-secondary)', wordBreak: 'break-all', fontFamily: 'DM Mono, monospace' }}>
+                      {`${window.location.origin}/public/${publicToken}`}
+                    </div>
+                    <button
+                      onClick={copyPublicLink}
+                      className="btn-primary"
+                      style={{ height: 38, paddingLeft: 14, paddingRight: 14, fontSize: 12, gap: 6, flexShrink: 0 }}
+                    >
+                      {linkCopied ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.5 }}>
+                    This link shows posts, selected keywords, plan & next payment date. No edit or approve actions are visible.
+                  </div>
+                  <div style={{ borderTop: '1px solid var(--border)', marginTop: 16, paddingTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Regenerate to invalidate old link</span>
+                    <button onClick={generatePublicLink} className="btn-ghost" disabled={genLoading} style={{ fontSize: 12, height: 32, gap: 6 }}>
+                      {genLoading ? <><Loader2 size={12} className="spin" /> Generating…</> : <><RefreshCw size={12} /> Regenerate</>}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                  <ExternalLink size={32} style={{ color: 'var(--accent-text)', margin: '0 auto 12px', display: 'block' }} />
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>No link generated yet</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>Generate a shareable link to send to this client.</div>
+                  <button onClick={generatePublicLink} className="btn-primary" disabled={genLoading} style={{ gap: 7 }}>
+                    {genLoading ? <><Loader2 size={13} className="spin" /> Generating…</> : <><ExternalLink size={13} /> Generate Link</>}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </Portal>
       )}
 
       <button onClick={() => navigate('/clients')} className="btn-ghost" style={{ gap: 6, marginBottom: 20, fontSize: 13, height: 34 }}>
@@ -2267,6 +2352,22 @@ export default function ClientOverviewPage() {
                   : <ToggleLeft size={16} />
               }
               {isActive ? 'Active' : 'Inactive'}
+            </button>
+
+            {/* Public share link */}
+            <button
+              onClick={openPublicLink}
+              className="btn-ghost"
+              style={{ height: 36, fontSize: 13, gap: 7, display: 'flex', alignItems: 'center' }}
+              title="Share client report"
+            >
+              <ExternalLink size={13} />
+              <span>Public Link</span>
+              {publicToken && (
+                <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--green-light)', color: 'var(--green-text)', borderRadius: 10, padding: '1px 5px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Active
+                </span>
+              )}
             </button>
 
             {/* Google link */}

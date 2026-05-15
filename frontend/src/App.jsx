@@ -9,6 +9,7 @@ import ClientOverviewPage from './pages/ClientOverviewPage';
 import BillingPage        from './pages/BillingPage';
 import TeamPage           from './pages/TeamPage';
 import SettingsPage       from './pages/SettingsPage';
+import PublicClientPage   from './pages/PublicClientPage';
 
 function Guard({ children }) {
   const { user } = useAuthStore();
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="settings"    element={<SettingsPage />} />
       </Route>
 
+      <Route path="/public/:token" element={<PublicClientPage />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

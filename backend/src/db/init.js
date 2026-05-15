@@ -104,6 +104,8 @@ export async function initDb() {
     'ALTER TABLE clients ADD COLUMN logo_url TEXT',
     // Keyword source
     "ALTER TABLE keywords ADD COLUMN source TEXT DEFAULT 'ai'",
+    // Public share token
+    'ALTER TABLE clients ADD COLUMN public_token TEXT',
   ];
   for (const sql of migrations) {
     try { db.prepare(sql).run(); } catch { /* column already exists */ }

@@ -24,6 +24,7 @@ import teamRoutes          from './src/routes/team.js';
 import notificationsRoutes from './src/routes/notifications.js';
 import categoriesRoutes    from './src/routes/categories.js';
 import reportsRoutes       from './src/routes/reports.js';
+import publicRoutes        from './src/routes/public.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT      = process.env.PORT || 3000;
@@ -63,6 +64,7 @@ app.use('/api/team',          teamRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/categories',    categoriesRoutes);
 app.use('/api/reports',       reportsRoutes);
+app.use('/api/public',        publicRoutes);
 
 app.get('/api/health', (_req, res) =>
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
