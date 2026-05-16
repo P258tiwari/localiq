@@ -1032,7 +1032,7 @@ function ReviewsTab({ clientId }) {
   const canGenerate = !loading && (mode === 'no_feedback' || feedback.trim().length > 0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className="review-layout" style={{ alignItems: 'start' }}>
 
       {/* ── Form card ── */}
       <div className="card" style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -1121,7 +1121,9 @@ function ReviewsTab({ clientId }) {
         </button>
       </div>
 
-      {/* ── Result panel ── */}
+      {/* ── Right column: Result panel ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
       {!result && !loading && !genError && (
         <div style={{ padding: '40px 24px', textAlign: 'center', border: '1.5px dashed var(--border)', borderRadius: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -1159,6 +1161,7 @@ function ReviewsTab({ clientId }) {
         </div>
       )}
 
+      </div>{/* end right column */}
     </div>
   );
 }
