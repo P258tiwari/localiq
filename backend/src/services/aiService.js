@@ -484,11 +484,10 @@ Return JSON: {"title":"under 10 words","content":"under 150 words, no hashtags",
 
 export async function generateImage(prompt) {
   const r = await openai.images.generate({
-    model: 'dall-e-3',
+    model: 'gpt-image-2',
     prompt: `Professional business photo, photorealistic: ${prompt}. No text, no typography, no words anywhere in the image.`,
     n: 1,
-    size: '1024x1024',
-    quality: 'standard',
+    size: '1536x1024',
   });
   const img = r.data[0];
   if (img.b64_json) return `data:image/png;base64,${img.b64_json}`;
