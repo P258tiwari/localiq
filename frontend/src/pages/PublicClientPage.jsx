@@ -273,34 +273,62 @@ export default function PublicClientPage() {
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 16px 48px' }}>
 
         {/* Plan + Next payment */}
-        {billing && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
-            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <CreditCard size={16} style={{ color: '#6c3ef4' }} />
+        {billing && (() => {
+          const daysLeft = billing.next_due_date
+            ? Math.ceil((new Date(billing.next_due_date) - new Date()) / 86400000)
+            : null;
+          const isOverdue = billing.payment_status === 'overdue' || (daysLeft !== null && daysLeft < 0);
+          const isPaid    = billing.payment_status === 'paid';
+          const statusChip = isPaid
+            ? { label: 'Paid', bg: '#dcfce7', color: '#16a34a' }
+            : isOverdue
+            ? { label: 'Overdue', bg: '#fee2e2', color: '#dc2626' }
+            : { label: 'Upcoming', bg: '#fef9c3', color: '#b45309' };
+
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
+              {/* Plan card */}
+              <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <CreditCard size={16} style={{ color: '#6c3ef4' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Plan</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{billing.plan_name || '—'}</div>
+                  <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+                    {fmtINR(billing.monthly_amount)} · Monthly
+                  </div>
+                </div>
               </div>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Plan</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>{billing.plan_name || '—'}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>{fmtINR(billing.monthly_amount)} / month</div>
+
+              {/* Next payment card */}
+              <div style={{ background: '#fff', border: `1px solid ${isOverdue ? '#fecaca' : '#e5e7eb'}`, borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: isOverdue ? '#fee2e2' : '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <CalendarDays size={16} style={{ color: isOverdue ? '#dc2626' : '#ca8a04' }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Next Payment</div>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: statusChip.bg, color: statusChip.color, borderRadius: 20, padding: '1px 7px' }}>
+                      {statusChip.label}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: isOverdue ? '#dc2626' : '#111827' }}>
+                    {fmtDate(billing.next_due_date)}
+                  </div>
+                  {daysLeft !== null && (
+                    <div style={{ fontSize: 12, color: isOverdue ? '#dc2626' : '#6b7280', marginTop: 2, fontWeight: isOverdue ? 600 : 400 }}>
+                      {isOverdue
+                        ? `${Math.abs(daysLeft)} day${Math.abs(daysLeft) !== 1 ? 's' : ''} overdue`
+                        : daysLeft === 0 ? 'Due today'
+                        : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <CalendarDays size={16} style={{ color: '#ca8a04' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Next Payment</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: billing.payment_status === 'overdue' ? '#ef4444' : '#111827' }}>
-                  {fmtDate(billing.next_due_date)}
-                </div>
-                <div style={{ fontSize: 12, color: billing.payment_status === 'overdue' ? '#ef4444' : '#6b7280', fontWeight: billing.payment_status === 'overdue' ? 600 : 400 }}>
-                  {billing.payment_status === 'paid' ? 'Paid' : billing.payment_status === 'overdue' ? 'Overdue' : 'Upcoming'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Keywords */}
         {keywords.length > 0 && (
