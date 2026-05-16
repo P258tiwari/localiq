@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { FileText, Tag, CreditCard, CalendarDays, MapPin, ExternalLink, AlertCircle, X, Image } from 'lucide-react';
 
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE = import.meta.env.VITE_API_URL || '';
 
 function fmtDate(d) {
   if (!d) return '—';
