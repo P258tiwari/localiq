@@ -17,6 +17,13 @@ function fmtINR(n) {
   return '₹' + Number(n || 0).toLocaleString('en-IN');
 }
 
+const POST_TYPE_LABEL = {
+  update:  'Post',
+  offer:   'Offer',
+  event:   'Event',
+  product: 'Product',
+};
+
 const POST_TYPE_COLOR = {
   update:  { bg: '#eff6ff', color: '#2563eb' },
   offer:   { bg: '#fefce8', color: '#ca8a04' },
@@ -25,10 +32,10 @@ const POST_TYPE_COLOR = {
 };
 
 const STATUS_META = {
-  published: { label: 'Published', bg: '#f0fdf4', color: '#16a34a' },
-  scheduled:  { label: 'Scheduled', bg: '#fefce8', color: '#ca8a04' },
-  draft:      { label: 'Draft',     bg: '#f3f4f6', color: '#6b7280' },
-  failed:     { label: 'Failed',    bg: '#fef2f2', color: '#ef4444' },
+  published: { label: 'Approved',        bg: '#dcfce7', color: '#16a34a' },
+  scheduled: { label: 'Approved',        bg: '#dcfce7', color: '#16a34a' },
+  draft:     { label: 'Pending Approval', bg: '#f3f4f6', color: '#6b7280' },
+  failed:    { label: 'Failed',           bg: '#fef2f2', color: '#ef4444' },
 };
 
 /* ── Post Detail Modal ─────────────────────────────────────────────────── */
@@ -95,7 +102,7 @@ function PostModal({ post, onClose }) {
           {/* Badges row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '3px 10px', borderRadius: 20, background: tc.bg, color: tc.color }}>
-              {post.post_type}
+              {POST_TYPE_LABEL[post.post_type] || post.post_type}
             </span>
             <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: sm.bg, color: sm.color }}>
               {sm.label}
@@ -180,7 +187,7 @@ function PostCard({ post, onClick }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 6, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: 5 }}>
             <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', padding: '2px 7px', borderRadius: 20, background: tc.bg, color: tc.color }}>
-              {post.post_type}
+              {POST_TYPE_LABEL[post.post_type] || post.post_type}
             </span>
             <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 20, background: sm.bg, color: sm.color }}>
               {sm.label}
