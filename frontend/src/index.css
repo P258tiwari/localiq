@@ -201,6 +201,7 @@ html, body, #root {
   align-items: center;
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
