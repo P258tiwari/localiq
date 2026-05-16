@@ -205,7 +205,6 @@ html, body, #root {
   align-items: center;
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
-  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -274,10 +273,18 @@ html, body, #root {
   .tab-bar { @apply flex items-center gap-1 border-b; border-color: var(--border); }
   .tab {
     @apply px-4 py-3 text-sm font-medium transition-colors duration-150 cursor-pointer select-none relative whitespace-nowrap;
-    color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px;
+    color: var(--text-secondary);
   }
   .tab:hover { color: var(--text-primary); }
-  .tab-active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  .tab-active { color: var(--text-primary); }
+  .tab-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px 1px 0 0;
+  }
 
   .progress-bar { @apply w-full rounded-full overflow-hidden; height: 4px; background: var(--border); }
   .progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
