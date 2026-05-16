@@ -126,12 +126,14 @@ export async function generatePosts(req, res, next) {
     const keywords   = db.prepare('SELECT keyword FROM keywords WHERE client_id = ?').all(client_id).map(r => r.keyword);
 
     const {
-      target_month = new Date().getMonth() + 1,
-      target_year  = new Date().getFullYear(),
+      target_month, month,
+      target_year, year,
       save_as_drafts = true
     } = req.body;
+    const resolvedMonth = parseInt(target_month || month) || new Date().getMonth() + 1;
+    const resolvedYear  = parseInt(target_year  || year)  || new Date().getFullYear();
 
-    const posts = await generateMonthlyPosts(client, seoDetails, keywords, parseInt(target_month), parseInt(target_year));
+    const posts = await generateMonthlyPosts(client, seoDetails, keywords, resolvedMonth, resolvedYear);
 
     let saved = [];
     if (save_as_drafts && Array.isArray(posts) && posts.length) {
