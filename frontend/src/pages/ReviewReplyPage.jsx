@@ -130,7 +130,7 @@ export default function ReviewReplyPage() {
 
   return (
     <div className="page" style={{ paddingTop: 24, paddingBottom: 40 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: 20, alignItems: 'start' }} className="review-layout">
+      <div className="review-layout" style={{ alignItems: 'start' }}>
         {/* Left panel — input */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Review input card */}
