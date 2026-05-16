@@ -251,7 +251,7 @@ Return a JSON array of EXACTLY 50 keyword objects. No more, no less.
 Distribution guide: 15 high-priority, 20 medium, 15 low. Mix of service, location, near_me, and informational intents.`.trim();
 
   try {
-    const text   = await ask(prompt, 5000, 'generateKeywords');
+    const text   = await ask(prompt, 16000, 'generateKeywords');
     const result = safeParseJSON(text, 'generateKeywords');
     return Array.isArray(result) ? result : { error: 'Expected array', raw: result };
   } catch (err) {
