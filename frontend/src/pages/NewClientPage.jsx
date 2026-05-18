@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -125,7 +125,7 @@ function TagInput({ value, onChange, placeholder }) {
       {tags.map((tag, i) => (
         <span key={i} style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
-          background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.25)',
+          background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.25)',
           color: 'var(--accent-text)', borderRadius: 20,
           padding: '3px 10px', fontSize: 12, fontWeight: 500, lineHeight: 1,
         }}>
@@ -242,7 +242,7 @@ function AIResultCard({ result }) {
       </div>
 
       {result.suggested_short_description && (
-        <div className="card" style={{ padding: '14px 18px', border: '1px solid rgba(108,62,244,0.25)', background: 'var(--accent-light)' }}>
+        <div className="card" style={{ padding: '14px 18px', border: '1px solid hsla(219,74%,53%,0.25)', background: 'var(--accent-light)' }}>
           <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--accent-text)', marginBottom: 6 }}>Tagline</div>
           <div style={{ fontSize: 13, color: 'var(--accent-text)', fontStyle: 'italic', lineHeight: 1.6 }}>
             "{result.suggested_short_description}"
@@ -514,7 +514,7 @@ function Step3({ data, update }) {
             const active = data.plan_name === plan;
             const colors = {
               Free:    { bg: active ? '#1A1A2E' : 'var(--bg-input)',    border: active ? '#4B4B8F' : 'var(--border)', text: active ? '#8B8BFF' : 'var(--text-secondary)' },
-              Pro:     { bg: active ? 'var(--accent-light)' : 'var(--bg-input)', border: active ? 'rgba(108,62,244,0.5)' : 'var(--border)', text: active ? 'var(--accent-text)' : 'var(--text-secondary)' },
+              Pro:     { bg: active ? 'var(--accent-light)' : 'var(--bg-input)', border: active ? 'hsla(219,74%,53%,0.5)' : 'var(--border)', text: active ? 'var(--accent-text)' : 'var(--text-secondary)' },
               Premium: { bg: active ? 'rgba(255,180,0,0.1)' : 'var(--bg-input)', border: active ? 'rgba(255,180,0,0.5)' : 'var(--border)', text: active ? 'var(--yellow-text)' : 'var(--text-secondary)' },
             };
             const c = colors[plan];
@@ -587,7 +587,7 @@ function Step4({ data, update }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{
         padding: '12px 16px', borderRadius: 10,
-        background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)',
+        background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)',
         fontSize: 13, color: 'var(--accent-text)', lineHeight: 1.6,
       }}>
         <Sparkles size={13} style={{ display: 'inline', marginRight: 6 }} />
@@ -708,7 +708,7 @@ function StageCard({ num, title, done, locked, children }) {
         <div style={{
           width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
           background: done ? 'var(--green-light)' : locked ? 'var(--bg-input)' : 'var(--accent-light)',
-          border: `2px solid ${done ? 'var(--green-text)' : locked ? 'var(--border)' : 'rgba(108,62,244,0.4)'}`,
+          border: `2px solid ${done ? 'var(--green-text)' : locked ? 'var(--border)' : 'hsla(219,74%,53%,0.4)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 11, fontWeight: 700,
           color: done ? 'var(--green-text)' : locked ? 'var(--text-muted)' : 'var(--accent-text)',
@@ -817,7 +817,7 @@ function Step5({ data, onSave, saveLoading, saveError }) {
                 <span key={kw.id} style={{
                   fontSize: 12, padding: '3px 10px', borderRadius: 20,
                   background: 'var(--accent-light)', color: 'var(--accent-text)',
-                  border: '1px solid rgba(108,62,244,0.2)',
+                  border: '1px solid hsla(219,74%,53%,0.2)',
                 }}>
                   {kw.keyword}
                 </span>

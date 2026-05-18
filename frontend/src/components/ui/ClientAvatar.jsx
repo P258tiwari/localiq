@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+﻿import { useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Cropper from 'react-easy-crop';
 import { Camera, X, Upload, Check, Loader2 } from 'lucide-react';
@@ -180,7 +180,7 @@ export default function ClientAvatar({ client, size = 36, radius = 8, onLogoUpda
             />
           : <div style={{
               width: size, height: size, borderRadius: radius,
-              background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)',
+              background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: size * 0.33, fontWeight: 700, color: 'var(--accent-text)',
             }}>

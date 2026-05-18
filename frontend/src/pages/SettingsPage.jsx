@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Key, User, Shield, Loader2, Upload, X, Lock, Pencil, Check } from 'lucide-react';
 import api from '../services/api';
@@ -47,7 +47,7 @@ function AgencySettingsCard() {
               onClick={() => !logo && fileRef.current?.click()}
               style={{
                 width: 80, height: 80, borderRadius: 12, flexShrink: 0,
-                border: `2px dashed ${logo ? 'var(--border)' : 'rgba(108,62,244,0.4)'}`,
+                border: `2px dashed ${logo ? 'var(--border)' : 'hsla(219,74%,53%,0.4)'}`,
                 background: logo ? 'transparent' : 'var(--bg-input)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 overflow: 'hidden', cursor: logo ? 'default' : 'pointer',
@@ -143,7 +143,7 @@ export default function SettingsPage() {
 
   /* ── Role chip color ── */
   const roleStyle = user?.role === 'admin'
-    ? { background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid rgba(108,62,244,0.2)' }
+    ? { background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid hsla(219,74%,53%,0.2)' }
     : { background: 'var(--bg-input)',     color: 'var(--text-secondary)', border: '1px solid var(--border)' };
 
   const [currentPw, setCurrentPw] = useState('');

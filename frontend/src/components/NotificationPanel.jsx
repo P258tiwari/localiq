@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -198,12 +198,12 @@ export default function NotificationPanel({ onClose }) {
                 padding: '12px 18px',
                 cursor: 'pointer',
                 borderBottom: '1px solid var(--border)',
-                background: notif.is_read ? 'transparent' : 'rgba(108,62,244,0.04)',
+                background: notif.is_read ? 'transparent' : 'hsla(219,74%,53%,0.04)',
                 transition: 'background 0.1s',
                 position: 'relative',
               }}
               onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-card-hover)'}
-              onMouseLeave={e => e.currentTarget.style.background = notif.is_read ? 'transparent' : 'rgba(108,62,244,0.04)'}
+              onMouseLeave={e => e.currentTarget.style.background = notif.is_read ? 'transparent' : 'hsla(219,74%,53%,0.04)'}
             >
               {/* Unread dot */}
               {!notif.is_read && (

@@ -9,14 +9,14 @@
   --bg-card-hover: #F9FAFB;
   --bg-input:      #F3F4F6;
   --border:        #E5E7EB;
-  --border-focus:  #6C3EF4;
+  --border-focus:  hsla(219, 74%, 53%, 1);
   --text-primary:   #111827;
   --text-secondary: #4B5563;
   --text-muted:     #9CA3AF;
-  --accent:       #6C3EF4;
-  --accent-hover: #5B2EE8;
-  --accent-light: #EDE9FE;
-  --accent-text:  #5B21B6;
+  --accent:       hsla(219, 74%, 53%, 1);
+  --accent-hover: hsla(219, 74%, 43%, 1);
+  --accent-light: hsla(219, 74%, 95%, 1);
+  --accent-text:  hsla(219, 74%, 35%, 1);
   --green-light: #DCFCE7;
   --green-text:  #16A34A;
   --red-light:   #FEE2E2;
@@ -236,7 +236,7 @@ html, body, #root {
     background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary);
   }
   .input::placeholder { color: var(--text-muted); }
-  .input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(108,62,244,0.15); }
+  .input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px hsla(219,74%,53%,0.15); }
   select.input { cursor: pointer; }
   input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0); cursor: pointer; }
 
@@ -268,7 +268,7 @@ html, body, #root {
     color: var(--text-secondary); border: 1px solid transparent;
   }
   .chip:hover { color: var(--text-primary); background: var(--bg-input); }
-  .chip-active { color: var(--accent-text); background: var(--accent-light); border-color: rgba(108,62,244,0.25); }
+  .chip-active { color: var(--accent-text); background: var(--accent-light); border-color: hsla(219,74%,53%,0.25); }
 
   .tab-bar { @apply flex items-center gap-1 border-b; border-color: var(--border); }
   .tab {

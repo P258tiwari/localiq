@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -133,7 +133,7 @@ function PostModal({ post, onClose }) {
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
                 marginTop: 20, padding: '11px 20px', borderRadius: 10,
-                background: '#6c3ef4', color: '#fff',
+                background: 'hsla(219,74%,53%,1)', color: '#fff',
                 fontSize: 13, fontWeight: 600, textDecoration: 'none',
                 transition: 'opacity 0.15s',
               }}
@@ -177,7 +177,7 @@ function PostCard({ post, onClick }) {
           onError={e => { e.currentTarget.style.display = 'none'; }}
         />
       ) : (
-        <div style={{ width: '100%', height: 80, background: 'linear-gradient(135deg,#ede9fe,#f3f4f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: 80, background: 'linear-gradient(135deg,hsla(219,74%,95%,1),#f3f4f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Image size={28} style={{ color: '#c4b5fd' }} />
         </div>
       )}
@@ -257,7 +257,7 @@ export default function PublicClientPage() {
           {client.logo_url ? (
             <img src={client.logo_url} alt="" style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover', border: '1px solid #e5e7eb' }} />
           ) : (
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#6c3ef4,#9b6dff)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: '#fff' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,hsla(219,74%,53%,1),hsla(219,74%,70%,1))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 700, color: '#fff' }}>
               {(client.business_name || '?')[0].toUpperCase()}
             </div>
           )}
@@ -270,8 +270,8 @@ export default function PublicClientPage() {
             )}
           </div>
           <div style={{ marginLeft: 'auto' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#fff', background: '#6c3ef4', padding: '4px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-              Powered by LocalIQ
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#fff', background: 'hsla(219,74%,53%,1)', padding: '4px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Powered by Ampwake Local
             </div>
           </div>
         </div>
@@ -296,8 +296,8 @@ export default function PublicClientPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12, marginBottom: 28 }}>
               {/* Plan card */}
               <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <CreditCard size={16} style={{ color: '#6c3ef4' }} />
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: 'hsla(219,74%,95%,1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <CreditCard size={16} style={{ color: 'hsla(219,74%,53%,1)' }} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Plan</div>
@@ -341,9 +341,9 @@ export default function PublicClientPage() {
         {keywords.length > 0 && (
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, marginBottom: 28, overflow: 'hidden' }}>
             <div style={{ padding: '14px 20px', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Tag size={15} style={{ color: '#6c3ef4' }} />
+              <Tag size={15} style={{ color: 'hsla(219,74%,53%,1)' }} />
               <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>Target Keywords</span>
-              <span style={{ fontSize: 11, background: '#ede9fe', color: '#6c3ef4', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
+              <span style={{ fontSize: 11, background: 'hsla(219,74%,95%,1)', color: 'hsla(219,74%,53%,1)', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
                 {keywords.length}
               </span>
             </div>
@@ -360,11 +360,11 @@ export default function PublicClientPage() {
         {/* Posts */}
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <FileText size={15} style={{ color: '#6c3ef4' }} />
+            <FileText size={15} style={{ color: 'hsla(219,74%,53%,1)' }} />
             <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>
               {new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })} Posts
             </span>
-            <span style={{ fontSize: 11, background: '#ede9fe', color: '#6c3ef4', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
+            <span style={{ fontSize: 11, background: 'hsla(219,74%,95%,1)', color: 'hsla(219,74%,53%,1)', borderRadius: 20, padding: '1px 8px', fontWeight: 600 }}>
               {posts.length}
             </span>
           </div>
@@ -384,7 +384,7 @@ export default function PublicClientPage() {
       </div>
 
       <div style={{ textAlign: 'center', padding: '16px 0 32px', fontSize: 11, color: '#9ca3af' }}>
-        Managed by Ampwake Group · LocalIQ
+        Managed by Ampwake Group · Ampwake Local
       </div>
     </div>
   );

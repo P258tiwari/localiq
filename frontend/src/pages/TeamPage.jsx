@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { UserPlus, Mail, Shield, MoreHorizontal, Edit2, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,7 +14,7 @@ function RadioCards({ options, value, onChange }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
       {options.map(opt => (
-        <label key={opt.val} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${value === opt.val ? 'rgba(108,62,244,0.5)' : 'var(--border)'}`, background: value === opt.val ? 'var(--accent-light)' : 'var(--bg-input)', cursor: 'pointer', transition: 'all 0.15s' }}>
+        <label key={opt.val} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${value === opt.val ? 'hsla(219,74%,53%,0.5)' : 'var(--border)'}`, background: value === opt.val ? 'var(--accent-light)' : 'var(--bg-input)', cursor: 'pointer', transition: 'all 0.15s' }}>
           <input type="radio" name={opt.val + '_grp'} value={opt.val} checked={value === opt.val} onChange={() => onChange(opt.val)} style={{ display: 'none' }} />
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: value === opt.val ? 'var(--accent-text)' : 'var(--text-primary)' }}>{opt.label}</div>
@@ -193,7 +193,7 @@ function MemberCard({ member }) {
             <div style={{
               width: 48, height: 48, borderRadius: 12, flexShrink: 0,
               background: isActive ? 'var(--accent-light)' : 'var(--bg-input)',
-              border: `1px solid ${isActive ? 'rgba(108,62,244,0.3)' : 'var(--border)'}`,
+              border: `1px solid ${isActive ? 'hsla(219,74%,53%,0.3)' : 'var(--border)'}`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: 'DM Mono, monospace', fontSize: 16, fontWeight: 500,
               color: isActive ? 'var(--accent-text)' : 'var(--text-muted)',
@@ -262,10 +262,10 @@ function PlaceholderCard({ onAdd }) {
     <button
       onClick={onAdd}
       style={{ border: '1.5px dashed var(--border)', borderRadius: 12, background: 'transparent', cursor: 'pointer', padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.15s', minHeight: 200 }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(108,62,244,0.4)'; e.currentTarget.style.background = 'var(--accent-light)'; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'hsla(219,74%,53%,0.4)'; e.currentTarget.style.background = 'var(--accent-light)'; }}
       onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'transparent'; }}
     >
-      <div style={{ width: 40, height: 40, borderRadius: 10, border: '1.5px dashed rgba(108,62,244,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: 40, height: 40, borderRadius: 10, border: '1.5px dashed hsla(219,74%,53%,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <UserPlus size={18} style={{ color: 'var(--accent-text)' }} />
       </div>
       <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent-text)' }}>Add Team Member</div>

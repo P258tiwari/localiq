@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import ClientAvatar from '../components/ui/ClientAvatar';
@@ -147,7 +147,7 @@ function InfoRow({ label, value, link, onEdit }) {
       <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0, marginRight: 12, paddingTop: 1 }}>{label}</span>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, flexShrink: 1 }}>
         {isEmpty ? (
-          <button onClick={onEdit} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px' }}>
+          <button onClick={onEdit} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px' }}>
             <Pencil size={9} /> Add
           </button>
         ) : link ? (
@@ -176,7 +176,7 @@ function ChipsRow({ label, value, onEdit }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: chips.length ? 8 : 0 }}>
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</span>
         {chips.length === 0 ? (
-          <button onClick={onEdit} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px' }}>
+          <button onClick={onEdit} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px' }}>
             <Pencil size={9} /> Add
           </button>
         ) : (
@@ -190,7 +190,7 @@ function ChipsRow({ label, value, onEdit }) {
       {chips.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {chips.map((c, i) => (
-            <span key={i} style={{ fontSize: 11, padding: '2px 9px', borderRadius: 20, background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)', color: 'var(--accent-text)', fontWeight: 500 }}>{c}</span>
+            <span key={i} style={{ fontSize: 11, padding: '2px 9px', borderRadius: 20, background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)', color: 'var(--accent-text)', fontWeight: 500 }}>{c}</span>
           ))}
         </div>
       )}
@@ -407,7 +407,7 @@ function AIProfileTab({ clientId, client, onGoToKeywords }) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {items.map((item, i) => (
             <span key={i} onClick={() => copyChip(item, i)} title="Click to copy"
-              style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20, background: copiedIdx === i ? 'var(--green-light)' : 'var(--accent-light)', border: `1px solid ${copiedIdx === i ? 'rgba(74,222,128,0.4)' : 'rgba(108,62,244,0.2)'}`, color: copiedIdx === i ? 'var(--green-text)' : 'var(--accent-text)', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s', userSelect: 'none' }}>
+              style={{ fontSize: 12, padding: '3px 10px', borderRadius: 20, background: copiedIdx === i ? 'var(--green-light)' : 'var(--accent-light)', border: `1px solid ${copiedIdx === i ? 'rgba(74,222,128,0.4)' : 'hsla(219,74%,53%,0.2)'}`, color: copiedIdx === i ? 'var(--green-text)' : 'var(--accent-text)', fontWeight: 500, cursor: 'pointer', transition: 'all 0.2s', userSelect: 'none' }}>
               {copiedIdx === i ? '✓ Copied' : item}
             </span>
           ))}
@@ -508,12 +508,12 @@ function AIProfileTab({ clientId, client, onGoToKeywords }) {
                     <div key={idx} style={{ borderBottom: idx < servicesByCategory.length - 1 ? '1px solid var(--border)' : 'none' }}>
                       <button
                         onClick={() => toggleAccordion(idx)}
-                        style={{ width: '100%', padding: '13px 20px', display: 'flex', alignItems: 'center', gap: 10, background: isOpen ? 'rgba(108,62,244,0.03)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                        style={{ width: '100%', padding: '13px 20px', display: 'flex', alignItems: 'center', gap: 10, background: isOpen ? 'hsla(219,74%,53%,0.03)' : 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                       >
                         <ChevronDown size={14} style={{ color: 'var(--text-muted)', transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.18s', flexShrink: 0 }} />
                         <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{cat.category}</span>
                         {cat.is_primary && (
-                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid rgba(108,62,244,0.2)', flexShrink: 0 }}>Primary</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid hsla(219,74%,53%,0.2)', flexShrink: 0 }}>Primary</span>
                         )}
                         <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0, marginRight: 4 }}>{cat.services?.length ?? 0} services</span>
                         {copyText && (
@@ -523,7 +523,7 @@ function AIProfileTab({ clientId, client, onGoToKeywords }) {
                         )}
                       </button>
                       {isOpen && cat.services?.length > 0 && (
-                        <div style={{ padding: '0 20px 12px', background: 'rgba(108,62,244,0.02)' }}>
+                        <div style={{ padding: '0 20px 12px', background: 'hsla(219,74%,53%,0.02)' }}>
                           {cat.services.map((svc, si) => (
                             <div key={si} style={{ padding: '10px 0', borderTop: '1px solid var(--border)', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                               <div style={{ flex: 1 }}>
@@ -647,7 +647,7 @@ function EditPostModal({ post: initialPost, onClose, onSaved, onDeleted }) {
               <Image size={28} style={{ color: 'var(--text-muted)' }} />
               <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>No image generated yet</div>
               {imgError && <div style={{ fontSize: 12, color: 'var(--red-text)', background: 'var(--red-light)', padding: '6px 12px', borderRadius: 6 }}>{imgError}</div>}
-              <button onClick={handleGenerateImage} disabled={genImgLoading} style={{ background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.3)', borderRadius: 8, padding: '8px 18px', cursor: 'pointer', fontSize: 12, color: 'var(--accent-text)', display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+              <button onClick={handleGenerateImage} disabled={genImgLoading} style={{ background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.3)', borderRadius: 8, padding: '8px 18px', cursor: 'pointer', fontSize: 12, color: 'var(--accent-text)', display: 'inline-flex', alignItems: 'center', gap: 7 }}>
                 {genImgLoading ? <><Loader2 size={13} className="spin" /> Generating image…</> : <><Image size={13} /> Generate Image</>}
               </button>
             </div>
@@ -680,7 +680,7 @@ function EditPostModal({ post: initialPost, onClose, onSaved, onDeleted }) {
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Targeted Keywords</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                    {keywordsUsed.map(kw => <span key={kw} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(108,62,244,0.2)' }}>{kw}</span>)}
+                    {keywordsUsed.map(kw => <span key={kw} style={{ fontSize: 11, color: 'var(--accent-text)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: 20, border: '1px solid hsla(219,74%,53%,0.2)' }}>{kw}</span>)}
                   </div>
                 </div>
               )}
@@ -787,7 +787,7 @@ function PostCard({ post: initialPost, onUpdate, onDelete }) {
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Generating image…</span>
               </div>
             ) : (
-              <button onClick={handleGenerateImage} style={{ background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.3)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, color: 'var(--accent-text)', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <button onClick={handleGenerateImage} style={{ background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.3)', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 12, color: 'var(--accent-text)', display: 'flex', alignItems: 'center', gap: 7 }}>
                 <Image size={13} /> Generate Image
               </button>
             )}
@@ -988,7 +988,7 @@ function StarRating({ rating, onChange, size = 24 }) {
 
 function ReplyCard({ title, text, accent }) {
   return (
-    <div className="card" style={{ padding: '14px 16px', ...(accent ? { border: '1px solid rgba(108,62,244,0.3)', background: 'var(--accent-light)' } : {}) }}>
+    <div className="card" style={{ padding: '14px 16px', ...(accent ? { border: '1px solid hsla(219,74%,53%,0.3)', background: 'var(--accent-light)' } : {}) }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: accent ? 'var(--accent-text)' : 'var(--text-muted)' }}>{title}</span>
         <CopyBtn text={text} />
@@ -1045,7 +1045,7 @@ function ReviewsTab({ clientId }) {
               { val: 'no_feedback',   label: 'No Feedback',   desc: 'Star rating only' },
               { val: 'with_feedback', label: 'With Feedback', desc: 'Stars + review text' },
             ].map(opt => (
-              <label key={opt.val} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${mode === opt.val ? 'rgba(108,62,244,0.5)' : 'var(--border)'}`, background: mode === opt.val ? 'var(--accent-light)' : 'var(--bg-input)', cursor: 'pointer', transition: 'all 0.15s' }}>
+              <label key={opt.val} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 14px', borderRadius: 10, border: `1.5px solid ${mode === opt.val ? 'hsla(219,74%,53%,0.5)' : 'var(--border)'}`, background: mode === opt.val ? 'var(--accent-light)' : 'var(--bg-input)', cursor: 'pointer', transition: 'all 0.15s' }}>
                 <input type="radio" name="review_mode" value={opt.val} checked={mode === opt.val} onChange={() => { setMode(opt.val); setResult(null); setGenError(null); }} style={{ display: 'none' }} />
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: mode === opt.val ? 'var(--accent-text)' : 'var(--text-primary)' }}>{opt.label}</div>
@@ -1087,7 +1087,7 @@ function ReviewsTab({ clientId }) {
                 key={t.value}
                 type="button"
                 onClick={() => setTone(t.value)}
-                style={{ padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${tone === t.value ? 'rgba(108,62,244,0.5)' : 'var(--border)'}`, background: tone === t.value ? 'var(--accent-light)' : 'var(--bg-input)', color: tone === t.value ? 'var(--accent-text)' : 'var(--text-secondary)', cursor: 'pointer', fontSize: 12, fontWeight: 500, transition: 'all 0.15s', textAlign: 'center' }}
+                style={{ padding: '9px 12px', borderRadius: 8, border: `1.5px solid ${tone === t.value ? 'hsla(219,74%,53%,0.5)' : 'var(--border)'}`, background: tone === t.value ? 'var(--accent-light)' : 'var(--bg-input)', color: tone === t.value ? 'var(--accent-text)' : 'var(--text-secondary)', cursor: 'pointer', fontSize: 12, fontWeight: 500, transition: 'all 0.15s', textAlign: 'center' }}
               >
                 {t.label}
               </button>
@@ -1286,11 +1286,11 @@ function KeywordsTab({ clientId }) {
           gap: 12, padding: '11px 20px', borderBottom: '1px solid var(--border)',
           alignItems: 'center',
           cursor: mode === 'manage' ? 'pointer' : 'default',
-          background: mode === 'manage' && isChecked ? 'rgba(108,62,244,0.04)' : 'transparent',
+          background: mode === 'manage' && isChecked ? 'hsla(219,74%,53%,0.04)' : 'transparent',
           transition: 'background 0.1s',
         }}
         onMouseEnter={e => { if (mode === 'manage') e.currentTarget.style.background = 'var(--bg-card-hover)'; }}
-        onMouseLeave={e => { e.currentTarget.style.background = mode === 'manage' && isChecked ? 'rgba(108,62,244,0.04)' : 'transparent'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = mode === 'manage' && isChecked ? 'hsla(219,74%,53%,0.04)' : 'transparent'; }}
       >
         {mode === 'manage' && (
           <input type="checkbox" checked={isChecked} onChange={() => toggleKeyword(k.id)}
@@ -1465,7 +1465,7 @@ function KeywordsTab({ clientId }) {
             <div className="card">
               <div style={{ padding: '10px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>AI Generated Keywords</span>
-                <span style={{ fontSize: 11, background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid rgba(108,62,244,0.2)', borderRadius: 20, padding: '1px 8px' }}>
+                <span style={{ fontSize: 11, background: 'var(--accent-light)', color: 'var(--accent-text)', border: '1px solid hsla(219,74%,53%,0.2)', borderRadius: 20, padding: '1px 8px' }}>
                   {aiKeywords.filter(k => k.selected).length}
                 </span>
               </div>
@@ -1627,7 +1627,7 @@ function BillingEditModal({ clientId, billing, onClose, onSaved }) {
                 const active = form.plan_name === plan;
                 const colors = {
                   Free:    { bg: active ? '#1A1A2E' : 'var(--bg-input)',    border: active ? '#4B4B8F' : 'var(--border)', text: active ? '#8B8BFF' : 'var(--text-secondary)' },
-                  Pro:     { bg: active ? 'var(--accent-light)' : 'var(--bg-input)', border: active ? 'rgba(108,62,244,0.5)' : 'var(--border)', text: active ? 'var(--accent-text)' : 'var(--text-secondary)' },
+                  Pro:     { bg: active ? 'var(--accent-light)' : 'var(--bg-input)', border: active ? 'hsla(219,74%,53%,0.5)' : 'var(--border)', text: active ? 'var(--accent-text)' : 'var(--text-secondary)' },
                   Premium: { bg: active ? 'rgba(255,180,0,0.1)' : 'var(--bg-input)', border: active ? 'rgba(255,180,0,0.5)' : 'var(--border)', text: active ? 'var(--yellow-text)' : 'var(--text-secondary)' },
                 };
                 const c = colors[plan];
@@ -2068,7 +2068,7 @@ function TagInput({ value, onChange, placeholder }) {
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, padding: '7px 10px', background: 'var(--bg-input)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'text', minHeight: 40, alignItems: 'center' }}
       onClick={e => e.currentTarget.querySelector('input')?.focus()}>
       {tags.map((tag, i) => (
-        <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.25)', color: 'var(--accent-text)', borderRadius: 20, padding: '2px 9px', fontSize: 12, fontWeight: 500 }}>
+        <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.25)', color: 'var(--accent-text)', borderRadius: 20, padding: '2px 9px', fontSize: 12, fontWeight: 500 }}>
           {tag}<X size={9} style={{ cursor: 'pointer' }} onClick={e => { e.stopPropagation(); removeTag(i); }} />
         </span>
       ))}

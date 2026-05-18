@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -150,7 +150,7 @@ function RevenueChart({ monthlyRevenue }) {
         <BarChart data={data} barCategoryGap="30%" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
           <YAxis hide />
-          <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(108,62,244,0.06)' }} />
+          <Tooltip content={<ChartTooltip />} cursor={{ fill: 'hsla(219,74%,53%,0.06)' }} />
           <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
             {data.map((entry) => (
               <Cell

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, ChevronRight, Plus, Filter, Building2, Download } from 'lucide-react';
@@ -29,7 +29,7 @@ function Initials({ name }) {
   return (
     <div style={{
       width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-      background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)',
+      background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: 'DM Mono, monospace', fontSize: 12, fontWeight: 500,
       color: 'var(--accent-text)', textTransform: 'uppercase',
@@ -128,7 +128,7 @@ export default function ClientsPage() {
               {f}
               <span style={{
                 fontFamily: 'DM Mono, monospace', fontSize: 11,
-                background: filter === f ? 'rgba(108,62,244,0.2)' : 'var(--border)',
+                background: filter === f ? 'hsla(219,74%,53%,0.2)' : 'var(--border)',
                 color: filter === f ? 'var(--accent-text)' : 'var(--text-muted)',
                 borderRadius: 20, padding: '1px 6px', marginLeft: 2,
               }}>

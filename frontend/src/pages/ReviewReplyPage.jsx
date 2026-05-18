@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import {
   Star, Sparkles, Copy, Check, Loader2, RefreshCw,
   User, ChevronDown, MessageCircle
@@ -82,7 +82,7 @@ function ReplyCard({ title, text, color = 'var(--text-primary)', accent = false 
   return (
     <div className="card" style={{
       padding: '16px 18px',
-      ...(accent ? { border: '1px solid rgba(108,62,244,0.3)', background: 'var(--accent-light)' } : {}),
+      ...(accent ? { border: '1px solid hsla(219,74%,53%,0.3)', background: 'var(--accent-light)' } : {}),
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: accent ? 'var(--accent-text)' : 'var(--text-muted)' }}>
@@ -199,7 +199,7 @@ export default function ReviewReplyPage() {
                   style={{
                     padding: '9px 14px',
                     borderRadius: 8,
-                    border: `1px solid ${tone === t.value ? 'rgba(108,62,244,0.5)' : 'var(--border)'}`,
+                    border: `1px solid ${tone === t.value ? 'hsla(219,74%,53%,0.5)' : 'var(--border)'}`,
                     background: tone === t.value ? 'var(--accent-light)' : 'var(--bg-input)',
                     color: tone === t.value ? 'var(--accent-text)' : 'var(--text-secondary)',
                     cursor: 'pointer', fontSize: 13, fontWeight: 500,

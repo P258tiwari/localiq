@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+﻿import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, CreditCard, UserCog, Settings,
   LogOut, ChevronRight, Sparkles, CalendarDays,
@@ -146,7 +146,7 @@ export default function Sidebar() {
                   padding: '7px 10px', borderRadius: 10, marginBottom: 2,
                   textDecoration: 'none', transition: 'background 0.15s',
                   background: isActive ? 'var(--accent-light)' : 'transparent',
-                  border: isActive ? '1px solid rgba(108,62,244,0.18)' : '1px solid transparent',
+                  border: isActive ? '1px solid hsla(219,74%,53%,0.18)' : '1px solid transparent',
                 })}
                 onMouseEnter={e => { if (!e.currentTarget.style.borderColor.includes('108')) e.currentTarget.style.background = 'var(--bg-input)'; }}
                 onMouseLeave={e => { if (!e.currentTarget.style.borderColor.includes('108')) e.currentTarget.style.background = 'transparent'; }}
@@ -162,7 +162,7 @@ export default function Sidebar() {
                 ) : null}
                 <div style={{
                   width: 28, height: 28, borderRadius: 7, flexShrink: 0,
-                  background: 'linear-gradient(135deg, var(--accent) 0%, #9b6dff 100%)',
+                  background: 'linear-gradient(135deg, var(--accent) 0%, hsla(219,74%,70%,1) 100%)',
                   display: c.logo_url ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: '0.02em',
                 }}>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, Bell, Plus, X, Menu, ArrowLeft, Loader2, Building2 } from 'lucide-react';
@@ -70,7 +70,7 @@ function SearchDropdown({ results, isLoading, query, onSelect, isMobileOverlay =
         >
           <div style={{
             width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-            background: 'var(--accent-light)', border: '1px solid rgba(108,62,244,0.2)',
+            background: 'var(--accent-light)', border: '1px solid hsla(219,74%,53%,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 11, fontWeight: 700, color: 'var(--accent-text)',
           }}>
@@ -345,7 +345,7 @@ export default function TopBar({ title = 'Dashboard' }) {
         <button onClick={() => setPanelOpen(v => !v)}
           style={{
             position: 'relative', width: 34, height: 34, borderRadius: 8,
-            border: `1px solid ${panelOpen ? 'rgba(108,62,244,0.4)' : 'var(--border)'}`,
+            border: `1px solid ${panelOpen ? 'hsla(219,74%,53%,0.4)' : 'var(--border)'}`,
             background: panelOpen ? 'var(--accent-light)' : 'var(--bg-card)',
             cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: panelOpen ? 'var(--accent-text)' : 'var(--text-secondary)',

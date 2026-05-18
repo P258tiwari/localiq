@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
@@ -43,7 +43,7 @@ export default function LoginPage() {
     }}>
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(108,62,244,0.12) 0%, transparent 60%)',
+        backgroundImage: 'radial-gradient(circle at 50% 0%, hsla(219,74%,53%,0.12) 0%, transparent 60%)',
       }} />
 
       <div style={{ width: '100%', maxWidth: 420, position: 'relative' }}>
@@ -54,7 +54,7 @@ export default function LoginPage() {
             background: 'var(--accent)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px',
-            boxShadow: '0 0 32px rgba(108,62,244,0.4)',
+            boxShadow: '0 0 32px hsla(219,74%,53%,0.4)',
           }}>
             <LayoutDashboard size={24} color="#fff" />
           </div>
@@ -139,7 +139,7 @@ export default function LoginPage() {
           <div style={{
             marginTop: 24, padding: 14,
             background: 'var(--accent-light)',
-            border: '1px solid rgba(108,62,244,0.2)',
+            border: '1px solid hsla(219,74%,53%,0.2)',
             borderRadius: 8,
           }}>
             <div style={{ fontSize: 12, color: 'var(--accent-text)', fontWeight: 500, marginBottom: 4 }}>

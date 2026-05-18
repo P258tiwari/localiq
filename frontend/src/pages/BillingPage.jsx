@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { CreditCard, X, Download, CalendarDays, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import StatCard from '../components/ui/StatCard';
@@ -106,7 +106,7 @@ export default function BillingPage() {
               style={{ whiteSpace: 'nowrap' }}
             >
               {t.label}
-              <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11, background: activeTab === t.id ? 'rgba(108,62,244,0.2)' : 'var(--border)', color: activeTab === t.id ? 'var(--accent-text)' : 'var(--text-muted)', borderRadius: 20, padding: '1px 6px' }}>
+              <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11, background: activeTab === t.id ? 'hsla(219,74%,53%,0.2)' : 'var(--border)', color: activeTab === t.id ? 'var(--accent-text)' : 'var(--text-muted)', borderRadius: 20, padding: '1px 6px' }}>
                 {t.id === 'due' ? dueSoon.length : t.id === 'late' ? overdue.length : paidList.length}
               </span>
             </button>
