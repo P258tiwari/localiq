@@ -8,8 +8,9 @@ import NewClientPage      from './pages/NewClientPage';
 import ClientOverviewPage from './pages/ClientOverviewPage';
 import BillingPage        from './pages/BillingPage';
 import TeamPage           from './pages/TeamPage';
-import SettingsPage       from './pages/SettingsPage';
-import PublicClientPage   from './pages/PublicClientPage';
+import SettingsPage        from './pages/SettingsPage';
+import PublicClientPage    from './pages/PublicClientPage';
+import PostGeneratorPage   from './pages/PostGeneratorPage';
 
 function Guard({ children }) {
   const { user } = useAuthStore();
@@ -28,9 +29,10 @@ export default function App() {
         <Route path="clients"     element={<ClientsPage />} />
         <Route path="clients/new" element={<NewClientPage />} />
         <Route path="clients/:id" element={<ClientOverviewPage />} />
-        <Route path="billing"     element={<BillingPage />} />
-        <Route path="team"        element={<TeamPage />} />
-        <Route path="settings"    element={<SettingsPage />} />
+        <Route path="billing"          element={<BillingPage />} />
+        <Route path="team"             element={<TeamPage />} />
+        <Route path="settings"         element={<SettingsPage />} />
+        <Route path="posts/generate"   element={<PostGeneratorPage />} />
       </Route>
 
       <Route path="/public/:token" element={<PublicClientPage />} />

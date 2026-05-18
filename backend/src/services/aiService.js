@@ -272,36 +272,48 @@ export async function generateMonthlyPosts(client, seoDetails, selectedKeywords 
   const context = buildClientBlock(client, seoDetails, selectedKeywords);
 
   const prompt = `
+You are a Google Business Profile content expert for Indian local businesses.
 Generate a complete monthly GBP post calendar for ${monthName} ${targetYear}.
-Create exactly 10 posts spread across the month (not all on the same day).
-Posts should be educational, promotional, and engagement-driving — not spammy.
-Each post must naturally include 1-2 of the selected keywords.
-Image prompts must be photorealistic, professional, 1200x900, Indian business setting where relevant, NO text or typography anywhere in the image.
+Create exactly 10 posts spread evenly across the month (roughly every 3 days).
 
-Target Month: ${monthName} ${targetYear} (has ${daysInMonth} days)
+Target Month: ${monthName} ${targetYear} (${daysInMonth} days)
 Selected Keywords: ${kwList}
 
 ${context}
 
+STRICT GBP CONTENT RULES — follow every rule, no exceptions:
+1. NO phone numbers, WhatsApp numbers, or contact details anywhere in post_description. Instead use: "Tap the Call Now button" or "Use the Book button".
+2. NO exaggerated claims. Banned words: No.1, Best, Guaranteed, 100% result, Cheapest, Instant result, Miracle, Dramatic results, Permanent solution. Use instead: Reliable, Professional, Trusted by customers, Designed to help, Suitable options available.
+3. NO keyword stuffing. Mention the service and city only once naturally. Do not repeat the same keyword more than once per post.
+4. NO fake urgency like "Only today" or "Last chance" unless it is a real time-limited offer.
+5. NO multiple links or URLs in post_description.
+6. post_description MUST be 80–150 words. Count carefully. This is a hard limit.
+7. Structure every post_description in this exact order:
+   Line 1: Opening hook (one sentence about the problem, occasion, or benefit)
+   Line 2-3: What the business offers for this need (mention service + city naturally)
+   Line 4: Simple CTA referencing the button — e.g. "Tap Call Now or Learn More to get started."
+8. Image prompts must be photorealistic, professional, 1200x900, Indian business setting, NO text, NO typography, NO words anywhere in the image.
+9. Do not mention Google in any post content.
+
 Return a JSON array of EXACTLY 10 post objects:
 [
   {
-    "post_title": "Internal title for team reference (not published)",
-    "post_heading": "Headline shown on post — max 10 words, attention-grabbing",
-    "post_description": "1000-1500 chars. Write in 3-4 short paragraphs. Paragraph 1: hook/problem statement. Paragraph 2: solution and what the business offers. Paragraph 3: key benefits with locally relevant detail and 2-3 keywords used naturally. Paragraph 4: clear CTA. Each paragraph separated by a blank line. Write like a knowledgeable local business expert. Must be between 1000 and 1500 characters — count carefully.",
-    "why_post": "One sentence explaining WHY this post should be published now and what business goal it serves.",
+    "post_title": "Internal title for team reference only (not published)",
+    "post_heading": "Headline for the post — max 10 words, attention-grabbing, no exaggerated claims",
+    "post_description": "80-150 words exactly. Structure: hook → service + city → CTA referencing button. No phone numbers. No keyword stuffing. Natural, warm, locally relevant language.",
+    "why_post": "One sentence: why publish this post now and what goal it serves.",
     "cta_text": "LEARN_MORE|BOOK|ORDER|CALL|SIGN_UP|BUY",
     "keywords_used": ["keyword1", "keyword2"],
     "target_service": "Which service or product this post promotes",
     "target_area": "Which city or area this targets",
-    "image_prompt": "Detailed DALL-E prompt: photorealistic, professional, 1200x900, [business context], Indian setting, no text, no typography, no words anywhere in the image",
+    "image_prompt": "Detailed DALL-E prompt: photorealistic, professional, 1200x900, [specific business context], Indian setting, warm lighting, no text, no typography, no words anywhere in the image",
     "post_type": "update",
     "suggested_date": "${targetYear}-${String(targetMonth).padStart(2,'0')}-DD",
     "suggested_time": "HH:MM"
   }
 ]
 
-CRITICAL: post_description must be 1000-1500 characters with 3-4 paragraphs separated by blank lines. Spread dates evenly: roughly every 3 days. All posts must be type "update". Suggested time should match business category (e.g. restaurants: 11:00, services: 09:30, retail: 18:00).`.trim();
+CRITICAL REMINDERS: post_description must be 80-150 words (count carefully). No phone numbers. No exaggerated claims. Dates spread evenly ~every 3 days. Suggested time should match business type (restaurants: 11:00, clinics: 09:30, retail: 18:00).`.trim();
 
   try {
     const text   = await ask(prompt, 8192, 'generateMonthlyPosts');
