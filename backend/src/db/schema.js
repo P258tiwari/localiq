@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS client_billing (
   monthly_amount  REAL DEFAULT 0,
   billing_cycle   TEXT DEFAULT 'monthly' CHECK(billing_cycle IN ('monthly','quarterly','annually')),
   next_due_date   TEXT,
+  plan_end_date   TEXT,
+  plan_total      REAL DEFAULT 0,
   payment_status  TEXT DEFAULT 'pending' CHECK(payment_status IN ('paid','pending','overdue')),
   notes           TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now')),

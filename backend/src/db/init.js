@@ -106,6 +106,9 @@ export async function initDb() {
     "ALTER TABLE keywords ADD COLUMN source TEXT DEFAULT 'ai'",
     // Public share token
     'ALTER TABLE clients ADD COLUMN public_token TEXT',
+    // Billing: plan contract end date + total contract value for partial payments
+    'ALTER TABLE client_billing ADD COLUMN plan_end_date TEXT',
+    'ALTER TABLE client_billing ADD COLUMN plan_total REAL DEFAULT 0',
   ];
   for (const sql of migrations) {
     try { db.prepare(sql).run(); } catch { /* column already exists */ }

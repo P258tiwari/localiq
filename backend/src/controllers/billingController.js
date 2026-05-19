@@ -6,6 +6,10 @@ import { createNotification } from '../services/notificationService.js';
 export function getBilling(req, res, next) {
   try {
     const billing = db.prepare('SELECT * FROM client_billing WHERE client_id = ?').get(req.params.clientId);
+    if (billing) {
+      const totalPaid = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM payment_history WHERE client_id = ?').get(req.params.clientId).t;
+      billing.pending_amount = Math.max(0, (billing.plan_total || 0) - totalPaid);
+    }
     res.json({ billing: billing || null });
   } catch (err) { next(err); }
 }
@@ -18,7 +22,7 @@ export function upsertBilling(req, res, next) {
     const existing = db.prepare('SELECT * FROM client_billing WHERE client_id = ?').get(clientId);
     if (existing) {
       // Partial update — only overwrite fields explicitly present in request body
-      const FIELDS = ['plan_name', 'monthly_amount', 'billing_cycle', 'next_due_date', 'payment_status', 'notes', 'start_date'];
+      const FIELDS = ['plan_name', 'monthly_amount', 'billing_cycle', 'next_due_date', 'plan_end_date', 'plan_total', 'payment_status', 'notes', 'start_date'];
       const sets   = [];
       const vals   = [];
       for (const f of FIELDS) {
@@ -33,11 +37,12 @@ export function upsertBilling(req, res, next) {
       }
     } else {
       db.prepare(`
-        INSERT INTO client_billing (id, client_id, plan_name, monthly_amount, billing_cycle, next_due_date, payment_status, notes, start_date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO client_billing (id, client_id, plan_name, monthly_amount, billing_cycle, next_due_date, plan_end_date, plan_total, payment_status, notes, start_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(uuidv4(), clientId,
              body.plan_name ?? null, body.monthly_amount ?? 0, body.billing_cycle ?? 'monthly',
-             body.next_due_date ?? null, body.payment_status ?? 'pending', body.notes ?? null, body.start_date ?? null);
+             body.next_due_date ?? null, body.plan_end_date ?? null, body.plan_total ?? 0,
+             body.payment_status ?? 'pending', body.notes ?? null, body.start_date ?? null);
     }
     const billing = db.prepare('SELECT * FROM client_billing WHERE client_id = ?').get(clientId);
     res.json({ billing });
@@ -70,8 +75,12 @@ export function addPayment(req, res, next) {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(id, clientId, amount, payment_date, payment_method ?? null, reference_no ?? null, notes ?? null);
 
-    // Update billing payment_status to 'paid' if this payment covers the due amount
-    db.prepare("UPDATE client_billing SET payment_status='paid', updated_at=datetime('now') WHERE client_id=?").run(clientId);
+    // Update billing payment_status: 'paid' only when total payments >= plan_total
+    const billingRow  = db.prepare('SELECT plan_total FROM client_billing WHERE client_id = ?').get(clientId);
+    const totalPaid   = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM payment_history WHERE client_id = ?').get(clientId).t;
+    const planTotal   = billingRow?.plan_total || 0;
+    const newStatus   = (planTotal > 0 && totalPaid >= planTotal) ? 'paid' : (planTotal > 0 ? 'pending' : 'paid');
+    db.prepare("UPDATE client_billing SET payment_status=?, updated_at=datetime('now') WHERE client_id=?").run(newStatus, clientId);
 
     const clientRow = db.prepare('SELECT business_name, assigned_to FROM clients WHERE id=?').get(clientId);
     const amtFmt    = `₹${Number(amount).toLocaleString('en-IN')}`;
@@ -118,8 +127,16 @@ export function getAllClientsBilling(req, res, next) {
         COALESCE(cb.monthly_amount, 0)    AS monthly_amount,
         COALESCE(cb.payment_status, 'pending') AS payment_status,
         cb.next_due_date,
+        cb.plan_end_date,
+        COALESCE(cb.plan_total, 0) AS plan_total,
         (SELECT payment_date FROM payment_history
-         WHERE client_id = c.id ORDER BY payment_date DESC LIMIT 1) AS last_paid_on
+         WHERE client_id = c.id ORDER BY payment_date DESC LIMIT 1) AS last_paid_on,
+        COALESCE(
+          CASE WHEN COALESCE(cb.plan_total,0) > 0
+            THEN cb.plan_total - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id),0)
+            ELSE NULL
+          END, NULL
+        ) AS pending_amount
       FROM clients c
       LEFT JOIN client_billing cb ON cb.client_id = c.id
       WHERE c.status != 'inactive'

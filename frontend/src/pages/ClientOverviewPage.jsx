@@ -1487,7 +1487,7 @@ function KeywordsTab({ clientId }) {
 }
 
 /* ─── Record Payment Modal ───────────────────────────────────────────────── */
-function RecordPaymentModal({ clientId, defaultAmount, onClose, onSaved }) {
+function RecordPaymentModal({ clientId, defaultAmount, billing, totalEarned = 0, onClose, onSaved }) {
   const { isMobile } = useBreakpoint();
   const [amount, setAmount]   = useState(defaultAmount || '');
   const [method, setMethod]   = useState('bank_transfer');
@@ -1496,7 +1496,12 @@ function RecordPaymentModal({ clientId, defaultAmount, onClose, onSaved }) {
   const [error, setError]     = useState(null);
   const today = new Date().toISOString().slice(0, 10);
   const nextMonthDefault = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const [nextDueDate, setNextDueDate] = useState(nextMonthDefault);
+  const [nextDueDate, setNextDueDate] = useState(
+    billing?.next_due_date || nextMonthDefault
+  );
+
+  const planTotal  = Number(billing?.plan_total || 0);
+  const pending    = planTotal > 0 ? Math.max(0, planTotal - totalEarned) : null;
 
   async function submit(e) {
     e.preventDefault();
@@ -1529,6 +1534,24 @@ function RecordPaymentModal({ clientId, defaultAmount, onClose, onSaved }) {
         </div>
         <form onSubmit={submit} style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {error && <div style={{ padding: '8px 12px', background: 'var(--red-light)', color: 'var(--red-text)', borderRadius: 8, fontSize: 13 }}>{error}</div>}
+
+          {/* Pending balance banner */}
+          {pending !== null && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: pending === 0 ? 'var(--green-light)' : 'var(--yellow-light)', borderRadius: 10, border: `1px solid ${pending === 0 ? 'rgba(22,163,74,0.2)' : 'rgba(180,83,9,0.2)'}` }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: pending === 0 ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                  {pending === 0 ? 'Fully Paid' : 'Pending Balance'}
+                </div>
+                <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 18, fontWeight: 700, color: pending === 0 ? 'var(--green-text)' : 'var(--yellow-text)', marginTop: 2 }}>
+                  {pending === 0 ? '₹0' : `₹${pending.toLocaleString('en-IN')}`}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right', fontSize: 11, color: 'var(--text-muted)' }}>
+                <div>Plan Total: ₹{planTotal.toLocaleString('en-IN')}</div>
+                <div>Received: ₹{totalEarned.toLocaleString('en-IN')}</div>
+              </div>
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div className="field">
@@ -1578,8 +1601,10 @@ function BillingEditModal({ clientId, billing, onClose, onSaved }) {
   const [form, setForm] = useState({
     plan_name:      billing?.plan_name      ?? 'Free',
     monthly_amount: billing?.monthly_amount ?? '',
+    plan_total:     billing?.plan_total     ?? '',
     billing_cycle:  billing?.billing_cycle  ?? 'monthly',
     start_date:     billing?.start_date     ?? '',
+    plan_end_date:  billing?.plan_end_date  ?? '',
     next_due_date:  billing?.next_due_date  ?? '',
   });
   const [saving, setSaving] = useState(false);
@@ -1593,6 +1618,7 @@ function BillingEditModal({ clientId, billing, onClose, onSaved }) {
       await api.put(`/billing/${clientId}`, {
         ...form,
         monthly_amount: isPaid && form.monthly_amount ? Number(form.monthly_amount) : 0,
+        plan_total: form.plan_total ? Number(form.plan_total) : 0,
       });
       onSaved();
     } catch (err) {
@@ -1642,13 +1668,20 @@ function BillingEditModal({ clientId, billing, onClose, onSaved }) {
             </div>
           </div>
 
-          {/* Amount + cycle — only for paid plans */}
+          {/* Amount + Plan Total + Cycle — only for paid plans */}
           {isPaid && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div style={fld}>
-                <label style={lbl}>Monthly Amount (₹)</label>
-                <input className="input" type="number" style={{ ...iw, fontFamily: 'DM Mono, monospace' }}
-                  value={form.monthly_amount} onChange={e => set('monthly_amount', e.target.value)} placeholder="12000" />
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div style={fld}>
+                  <label style={lbl}>Monthly Amount (₹)</label>
+                  <input className="input" type="number" style={{ ...iw, fontFamily: 'DM Mono, monospace' }}
+                    value={form.monthly_amount} onChange={e => set('monthly_amount', e.target.value)} placeholder="5000" />
+                </div>
+                <div style={fld}>
+                  <label style={lbl}>Plan Total (₹)</label>
+                  <input className="input" type="number" style={{ ...iw, fontFamily: 'DM Mono, monospace' }}
+                    value={form.plan_total} onChange={e => set('plan_total', e.target.value)} placeholder="15000" />
+                </div>
               </div>
               <div style={fld}>
                 <label style={lbl}>Billing Cycle</label>
@@ -1661,21 +1694,26 @@ function BillingEditModal({ clientId, billing, onClose, onSaved }) {
                   <ChevronDown size={11} style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)' }} />
                 </div>
               </div>
-            </div>
+            </>
           )}
 
-          {/* Dates — always shown */}
+          {/* Dates */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div style={fld}>
               <label style={lbl}>Start Date</label>
               <input className="input" type="date" style={{ ...iw, fontFamily: 'DM Mono, monospace', colorScheme: 'dark' }}
                 value={form.start_date} onChange={e => set('start_date', e.target.value)} />
             </div>
-            <div style={{ ...fld, marginBottom: 0 }}>
-              <label style={lbl}>Next Payment Date</label>
+            <div style={fld}>
+              <label style={lbl}>Plan End Date</label>
               <input className="input" type="date" style={{ ...iw, fontFamily: 'DM Mono, monospace', colorScheme: 'dark' }}
-                value={form.next_due_date} onChange={e => set('next_due_date', e.target.value)} />
+                value={form.plan_end_date} onChange={e => set('plan_end_date', e.target.value)} />
             </div>
+          </div>
+          <div style={{ ...fld, marginBottom: 0 }}>
+            <label style={lbl}>Next Payment Date</label>
+            <input className="input" type="date" style={{ ...iw, fontFamily: 'DM Mono, monospace', colorScheme: 'dark' }}
+              value={form.next_due_date} onChange={e => set('next_due_date', e.target.value)} />
           </div>
 
           {error && (
@@ -1823,19 +1861,37 @@ function BillingTab({ clientId, billing }) {
 
           {/* Details grid — hidden for Free plan */}
           {!isFree && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
-              {[
-                { label: 'Monthly Amount', value: fmt(billing?.monthly_amount), mono: true, accent: true },
-                { label: 'Billing Cycle',  value: billing?.billing_cycle ? billing.billing_cycle.charAt(0).toUpperCase() + billing.billing_cycle.slice(1) : '—' },
-                { label: 'Start Date',     value: fmtDate(billing?.start_date) },
-                { label: 'Next Due',       value: fmtDate(billing?.next_due_date) },
-              ].map(item => (
-                <div key={item.label} style={{ padding: '12px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{item.label}</div>
-                  <div style={{ fontFamily: item.mono ? 'DM Mono, monospace' : 'inherit', fontSize: item.mono ? 20 : 14, fontWeight: 600, color: item.accent ? 'var(--accent-text)' : 'var(--text-primary)' }}>{item.value}</div>
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                {[
+                  { label: 'Monthly Amount', value: fmt(billing?.monthly_amount), mono: true, accent: true },
+                  { label: 'Billing Cycle',  value: billing?.billing_cycle ? billing.billing_cycle.charAt(0).toUpperCase() + billing.billing_cycle.slice(1) : '—' },
+                  { label: 'Start Date',     value: fmtDate(billing?.start_date) },
+                  { label: 'Plan End Date',  value: fmtDate(billing?.plan_end_date) },
+                ].map(item => (
+                  <div key={item.label} style={{ padding: '12px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{item.label}</div>
+                    <div style={{ fontFamily: item.mono ? 'DM Mono, monospace' : 'inherit', fontSize: item.mono ? 20 : 14, fontWeight: 600, color: item.accent ? 'var(--accent-text)' : 'var(--text-primary)' }}>{item.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Next Payment + Pending row */}
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
+                <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Next Payment</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{fmtDate(billing?.next_due_date)}</div>
                 </div>
-              ))}
-            </div>
+                {Number(billing?.plan_total) > 0 && (
+                  <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', borderRadius: 10, border: `1px solid ${totalEarned >= Number(billing.plan_total) ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: totalEarned >= Number(billing.plan_total) ? 'var(--green-light)' : 'var(--yellow-light)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: totalEarned >= Number(billing.plan_total) ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Pending Balance</div>
+                    <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 16, fontWeight: 700, color: totalEarned >= Number(billing.plan_total) ? 'var(--green-text)' : 'var(--yellow-text)' }}>
+                      {totalEarned >= Number(billing.plan_total) ? '₹0 — Fully Paid' : `₹${Math.max(0, Number(billing.plan_total) - totalEarned).toLocaleString('en-IN')}`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
@@ -1897,6 +1953,8 @@ function BillingTab({ clientId, billing }) {
         <RecordPaymentModal
           clientId={clientId}
           defaultAmount={billing?.monthly_amount}
+          billing={billing}
+          totalEarned={totalEarned}
           onClose={() => setShowPayment(false)}
           onSaved={() => {
             queryClient.invalidateQueries({ queryKey: ['client', clientId] });
