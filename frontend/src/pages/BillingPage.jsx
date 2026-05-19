@@ -24,7 +24,7 @@ function fmtDate(d) {
 }
 
 
-const COL = '1fr 110px 130px 110px 120px 120px';
+const COL = '1fr 110px 110px 110px 110px 120px 120px';
 
 function TH({ children, center }) {
   return (
@@ -173,7 +173,8 @@ export default function BillingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: COL, gap: 12, padding: '10px 20px', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
             <TH>Client</TH>
             <TH center>Plan</TH>
-            <TH center>Amount</TH>
+            <TH center>Monthly</TH>
+            <TH center>Pending</TH>
             <TH center>Status</TH>
             <TH center>Last Paid</TH>
             <TH center>Next Due</TH>
@@ -202,7 +203,10 @@ export default function BillingPage() {
                 <div style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-text)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: 4 }}>{b.plan_name}</span>
                 </div>
-                <div style={{ textAlign: 'center', fontFamily: 'DM Mono, monospace', fontSize: 14, color: 'var(--text-primary)', fontWeight: 500 }}>{fmt(b.monthly_amount)}</div>
+                <div style={{ textAlign: 'center', fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--text-secondary)', fontWeight: 500 }}>{fmt(b.monthly_amount)}</div>
+                <div style={{ textAlign: 'center', fontFamily: 'DM Mono, monospace', fontSize: 13, fontWeight: 700, color: b.pending_amount > 0 ? 'var(--yellow-text)' : 'var(--green-text)' }}>
+                  {b.pending_amount > 0 ? fmt(b.pending_amount) : '—'}
+                </div>
                 <div style={{ textAlign: 'center' }}>
                   <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 8px', borderRadius: 20, background: meta.bg, color: meta.color }}>{meta.label}</span>
                 </div>
@@ -241,7 +245,8 @@ export default function BillingPage() {
                 { key: 'business_name', label: 'Client'    },
                 { key: 'city',          label: 'City'      },
                 { key: 'plan_name',     label: 'Plan'      },
-                { key: 'monthly_amount',label: 'Amount'    },
+                { key: 'monthly_amount',label: 'Monthly'   },
+                { key: 'pending_amount',label: 'Pending'   },
                 { key: 'payment_status',label: 'Status'    },
                 { key: 'last_paid_on',  label: 'Last Paid' },
                 { key: 'next_due_date', label: 'Next Due'  },

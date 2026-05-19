@@ -134,11 +134,17 @@ export function getAllClientsBilling(req, res, next) {
         COALESCE(cb.plan_total, 0) AS plan_total,
         (SELECT payment_date FROM payment_history
          WHERE client_id = c.id ORDER BY payment_date DESC LIMIT 1) AS last_paid_on,
-        COALESCE(
-          CASE WHEN COALESCE(cb.plan_total,0) > 0
-            THEN cb.plan_total - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id),0)
-            ELSE NULL
-          END, NULL
+        COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id), 0) AS total_received,
+        MAX(0,
+          CASE WHEN COALESCE(cb.plan_total, 0) > 0
+            THEN cb.plan_total
+            ELSE cb.monthly_amount * CASE cb.billing_cycle
+              WHEN 'monthly'   THEN 1
+              WHEN 'quarterly' THEN 3
+              WHEN 'annually'  THEN 12
+              ELSE 1 END
+          END
+          - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id), 0)
         ) AS pending_amount
       FROM clients c
       LEFT JOIN client_billing cb ON cb.client_id = c.id
