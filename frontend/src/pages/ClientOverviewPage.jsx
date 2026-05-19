@@ -1877,13 +1877,13 @@ function BillingTab({ clientId, billing }) {
               </div>
 
               {/* Next Payment + Pending row */}
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
-                <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4, justifyContent: 'flex-end' }}>
+                <div style={{ minWidth: 150, padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
                   <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Next Payment</div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{fmtDate(billing?.next_due_date)}</div>
                 </div>
                 {Number(billing?.plan_total) > 0 && (
-                  <div style={{ flex: 1, minWidth: 140, padding: '10px 14px', borderRadius: 10, border: `1px solid ${totalEarned >= Number(billing.plan_total) ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: totalEarned >= Number(billing.plan_total) ? 'var(--green-light)' : 'var(--yellow-light)' }}>
+                  <div style={{ minWidth: 150, padding: '10px 14px', borderRadius: 10, border: `1px solid ${totalEarned >= Number(billing.plan_total) ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: totalEarned >= Number(billing.plan_total) ? 'var(--green-light)' : 'var(--yellow-light)' }}>
                     <div style={{ fontSize: 10, fontWeight: 600, color: totalEarned >= Number(billing.plan_total) ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Pending Balance</div>
                     <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 16, fontWeight: 700, color: totalEarned >= Number(billing.plan_total) ? 'var(--green-text)' : 'var(--yellow-text)' }}>
                       {totalEarned >= Number(billing.plan_total) ? '₹0 — Fully Paid' : `₹${Math.max(0, Number(billing.plan_total) - totalEarned).toLocaleString('en-IN')}`}
