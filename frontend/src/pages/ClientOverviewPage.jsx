@@ -1500,8 +1500,11 @@ function RecordPaymentModal({ clientId, defaultAmount, billing, totalEarned = 0,
     billing?.next_due_date || nextMonthDefault
   );
 
-  const planTotal  = Number(billing?.plan_total || 0);
-  const pending    = planTotal > 0 ? Math.max(0, planTotal - totalEarned) : null;
+  const MULT      = { monthly: 1, quarterly: 3, annually: 12 };
+  const mult      = MULT[billing?.billing_cycle] || 1;
+  const autoTotal = (Number(billing?.monthly_amount) || 0) * mult;
+  const planTotal = Number(billing?.plan_total) > 0 ? Number(billing.plan_total) : autoTotal;
+  const pending   = planTotal > 0 ? Math.max(0, planTotal - totalEarned) : null;
 
   async function submit(e) {
     e.preventDefault();
@@ -1860,33 +1863,42 @@ function BillingTab({ clientId, billing }) {
           </div>
 
           {/* Details grid — hidden for Free plan */}
-          {!isFree && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
-              {[
-                { label: 'Monthly Amount', value: fmt(billing?.monthly_amount), mono: true, accent: true },
-                { label: 'Billing Cycle',  value: billing?.billing_cycle ? billing.billing_cycle.charAt(0).toUpperCase() + billing.billing_cycle.slice(1) : '—' },
-                { label: 'Start Date',     value: fmtDate(billing?.start_date) },
-                { label: 'Plan End Date',  value: fmtDate(billing?.plan_end_date) },
-                { label: 'Next Payment',   value: fmtDate(billing?.next_due_date) },
-              ].map(item => (
-                <div key={item.label} style={{ padding: '12px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{item.label}</div>
-                  <div style={{ fontFamily: item.mono ? 'DM Mono, monospace' : 'inherit', fontSize: item.mono ? 20 : 14, fontWeight: 600, color: item.accent ? 'var(--accent-text)' : 'var(--text-primary)' }}>{item.value}</div>
-                </div>
-              ))}
-              {Number(billing?.plan_total) > 0 && (() => {
-                const isPaid = totalEarned >= Number(billing.plan_total);
-                return (
-                  <div style={{ padding: '12px 14px', borderRadius: 10, border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: isPaid ? 'var(--green-light)' : 'var(--yellow-light)' }}>
-                    <div style={{ fontSize: 10, fontWeight: 600, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>Pending Balance</div>
-                    <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 16, fontWeight: 700, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)' }}>
-                      {isPaid ? '₹0 — Paid' : `₹${Math.max(0, Number(billing.plan_total) - totalEarned).toLocaleString('en-IN')}`}
-                    </div>
+          {!isFree && (() => {
+            const MULT    = { monthly: 1, quarterly: 3, annually: 12 };
+            const mult    = MULT[billing?.billing_cycle] || 1;
+            const autoTotal = (Number(billing?.monthly_amount) || 0) * mult;
+            const planTotal = Number(billing?.plan_total) > 0 ? Number(billing.plan_total) : autoTotal;
+            const pending   = Math.max(0, planTotal - totalEarned);
+            const isPaid    = planTotal > 0 && totalEarned >= planTotal;
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
+                {[
+                  { label: 'Monthly Amount', value: fmt(billing?.monthly_amount), mono: true, accent: true },
+                  { label: 'Billing Cycle',  value: billing?.billing_cycle ? billing.billing_cycle.charAt(0).toUpperCase() + billing.billing_cycle.slice(1) : '—' },
+                  { label: 'Start Date',     value: fmtDate(billing?.start_date) },
+                  { label: 'Plan End Date',  value: fmtDate(billing?.plan_end_date) },
+                  { label: 'Next Payment',   value: fmtDate(billing?.next_due_date) },
+                ].map(item => (
+                  <div key={item.label} style={{ padding: '12px 14px', background: 'var(--bg-input)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 6 }}>{item.label}</div>
+                    <div style={{ fontFamily: item.mono ? 'DM Mono, monospace' : 'inherit', fontSize: item.mono ? 20 : 14, fontWeight: 600, color: item.accent ? 'var(--accent-text)' : 'var(--text-primary)' }}>{item.value}</div>
                   </div>
-                );
-              })()}
-            </div>
-          )}
+                ))}
+                {/* Pending Amount tile — auto-calculated from cycle */}
+                <div style={{ padding: '12px 14px', borderRadius: 10, border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: isPaid ? 'var(--green-light)' : 'var(--yellow-light)' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Pending Amount</div>
+                  <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 18, fontWeight: 700, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', marginBottom: 6 }}>
+                    {isPaid ? '₹0' : `₹${pending.toLocaleString('en-IN')}`}
+                  </div>
+                  <div style={{ fontSize: 10, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', opacity: 0.75, lineHeight: 1.6 }}>
+                    <div>Total: ₹{planTotal.toLocaleString('en-IN')}</div>
+                    <div>Received: ₹{totalEarned.toLocaleString('en-IN')}</div>
+                    {isPaid && <div style={{ fontWeight: 600 }}>Fully Paid ✓</div>}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Total Earnings */}

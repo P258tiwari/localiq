@@ -75,11 +75,14 @@ export function addPayment(req, res, next) {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(id, clientId, amount, payment_date, payment_method ?? null, reference_no ?? null, notes ?? null);
 
-    // Update billing payment_status: 'paid' only when total payments >= plan_total
-    const billingRow  = db.prepare('SELECT plan_total FROM client_billing WHERE client_id = ?').get(clientId);
+    // Smart status: 'paid' when total received >= plan total (auto-calculated from cycle if plan_total not set)
+    const billingRow  = db.prepare('SELECT monthly_amount, billing_cycle, plan_total FROM client_billing WHERE client_id = ?').get(clientId);
     const totalPaid   = db.prepare('SELECT COALESCE(SUM(amount),0) AS t FROM payment_history WHERE client_id = ?').get(clientId).t;
-    const planTotal   = billingRow?.plan_total || 0;
-    const newStatus   = (planTotal > 0 && totalPaid >= planTotal) ? 'paid' : (planTotal > 0 ? 'pending' : 'paid');
+    const MULT        = { monthly: 1, quarterly: 3, annually: 12 };
+    const mult        = MULT[billingRow?.billing_cycle] || 1;
+    const autoTotal   = (billingRow?.monthly_amount || 0) * mult;
+    const planTotal   = (billingRow?.plan_total > 0) ? billingRow.plan_total : autoTotal;
+    const newStatus   = (planTotal > 0 && totalPaid >= planTotal) ? 'paid' : 'pending';
     db.prepare("UPDATE client_billing SET payment_status=?, updated_at=datetime('now') WHERE client_id=?").run(newStatus, clientId);
 
     const clientRow = db.prepare('SELECT business_name, assigned_to FROM clients WHERE id=?').get(clientId);
