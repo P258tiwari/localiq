@@ -1887,13 +1887,8 @@ function BillingTab({ clientId, billing }) {
                 {/* Pending Amount tile — auto-calculated from cycle */}
                 <div style={{ padding: '12px 14px', borderRadius: 10, border: `1px solid ${isPaid ? 'rgba(22,163,74,0.3)' : 'rgba(180,83,9,0.3)'}`, background: isPaid ? 'var(--green-light)' : 'var(--yellow-light)' }}>
                   <div style={{ fontSize: 10, fontWeight: 600, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Pending Amount</div>
-                  <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 18, fontWeight: 700, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', marginBottom: 6 }}>
-                    {isPaid ? '₹0' : `₹${pending.toLocaleString('en-IN')}`}
-                  </div>
-                  <div style={{ fontSize: 10, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)', opacity: 0.75, lineHeight: 1.6 }}>
-                    <div>Total: ₹{planTotal.toLocaleString('en-IN')}</div>
-                    <div>Received: ₹{totalEarned.toLocaleString('en-IN')}</div>
-                    {isPaid && <div style={{ fontWeight: 600 }}>Fully Paid ✓</div>}
+                  <div style={{ fontFamily: 'DM Mono, monospace', fontSize: 18, fontWeight: 700, color: isPaid ? 'var(--green-text)' : 'var(--yellow-text)' }}>
+                    {isPaid ? '₹0 — Fully Paid' : `₹${pending.toLocaleString('en-IN')}`}
                   </div>
                 </div>
               </div>
