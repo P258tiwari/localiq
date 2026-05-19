@@ -269,7 +269,7 @@ export default function DashboardPage() {
           Welcome back, {firstName}.{' '}
           <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontStyle: 'italic' }}>Here's today.</span>
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{today} · Ampwake Group: LocalIQ</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{today} · Ampwake Group: Ampwake Local</div>
       </div>
 
       {/* KPI grid — 2 col mobile, 4 col tablet, 8 col on wide */}

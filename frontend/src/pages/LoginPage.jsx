@@ -59,7 +59,7 @@ export default function LoginPage() {
             <LayoutDashboard size={24} color="#fff" />
           </div>
           <h1 style={{ fontFamily: 'Instrument Serif, serif', fontSize: 32, color: 'var(--text-primary)', marginBottom: 6 }}>
-            LocalIQ
+            Ampwake Local
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
             GMB Client Management — Ampwake Agency

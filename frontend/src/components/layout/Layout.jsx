@@ -16,7 +16,7 @@ const PAGE_TITLES = {
 function getTitle(pathname) {
   if (pathname.startsWith('/clients/') && pathname !== '/clients/new') return 'Client Overview';
   if (pathname === '/clients/new') return 'New Client';
-  return PAGE_TITLES[pathname] || 'LocalIQ';
+  return PAGE_TITLES[pathname] || 'Ampwake Local';
 }
 
 function LayoutInner() {
@@ -29,7 +29,7 @@ function LayoutInner() {
 
   /* Document title */
   useEffect(() => {
-    document.title = `${getTitle(pathname)} — LocalIQ`;
+    document.title = `${getTitle(pathname)} — Ampwake Local`;
   }, [pathname]);
 
   /* Lock body scroll when mobile sidebar is open */

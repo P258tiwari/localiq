@@ -69,8 +69,8 @@ export default function Sidebar() {
         flexShrink: 0, minHeight: 60,
       }}>
         {isIconOnly
-          ? <img src={localiqIcon} alt="LocalIQ" style={{ width: 32, height: 32, objectFit: 'contain' }} />
-          : <img src={localiqLogo} alt="LocalIQ" style={{ height: 32, width: 'auto', maxWidth: 160, objectFit: 'contain' }} />
+          ? <img src={localiqIcon} alt="Ampwake Local" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          : <img src={localiqLogo} alt="Ampwake Local" style={{ height: 32, width: 'auto', maxWidth: 160, objectFit: 'contain' }} />
         }
       </div>
 
