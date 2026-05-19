@@ -49,18 +49,18 @@ export default function BillingPage() {
   const plans = [...PLANS_BASE, ...new Set(billingList.map(b => b.plan_name).filter(Boolean).sort())];
 
   const tabs = [
-    { id: 'paid', label: 'Paid'     },
-    { id: 'due',  label: 'Due Soon' },
-    { id: 'late', label: 'Overdue'  },
+    { id: 'paid',    label: 'Paid'     },
+    { id: 'pending', label: 'Pending'  },
+    { id: 'due',     label: 'Due Soon' },
+    { id: 'late',    label: 'Overdue'  },
   ];
 
-  const statusMap = { due: 'due_soon', late: 'overdue', paid: 'paid' };
+  const statusMap = { paid: 'paid', pending: 'pending', due: 'due_soon', late: 'overdue' };
   const filtered = billingList.filter(b => {
     const statusOk = b.payment_status === statusMap[activeTab];
     const planOk   = planFilter === 'All Plans' || b.plan_name === planFilter;
     let dateOk = true;
     if (dateFrom || dateTo) {
-      // Paid tab → filter by last_paid_on; Due/Overdue tabs → filter by next_due_date
       const rawDate = activeTab === 'paid' ? b.last_paid_on : b.next_due_date;
       const d = rawDate ? rawDate.slice(0, 10) : null;
       if (!d) dateOk = false;
@@ -72,11 +72,12 @@ export default function BillingPage() {
     return statusOk && planOk && dateOk;
   });
 
-  const paidList  = billingList.filter(b => b.payment_status === 'paid');
-  const overdue   = billingList.filter(b => b.payment_status === 'overdue');
-  const dueSoon   = billingList.filter(b => b.payment_status === 'due_soon');
-  const totalMrr  = billingList.reduce((s, b) => s + (b.monthly_amount ?? 0), 0);
-  const mrr       = paidList.reduce((s, b) => s + (b.monthly_amount ?? 0), 0);
+  const paidList    = billingList.filter(b => b.payment_status === 'paid');
+  const pendingList = billingList.filter(b => b.payment_status === 'pending');
+  const overdue     = billingList.filter(b => b.payment_status === 'overdue');
+  const dueSoon     = billingList.filter(b => b.payment_status === 'due_soon');
+  const totalMrr    = billingList.reduce((s, b) => s + (b.monthly_amount ?? 0), 0);
+  const collected   = billingList.reduce((s, b) => s + (b.total_received ?? 0), 0);
 
   return (
     <div className="page" style={{ paddingTop: 24, paddingBottom: 40 }}>
@@ -86,10 +87,10 @@ export default function BillingPage() {
           [...Array(4)].map((_, i) => <div key={i} className="skeleton card" style={{ height: 110 }} />)
         ) : (
           <>
-            <StatCard label="Monthly MRR"   value={`₹${(totalMrr / 1000).toFixed(1)}K`}  sub="all active clients"                                                                               dotColor="var(--green-text)"  subColor="var(--green-text)" />
-            <StatCard label="Collected"     value={`₹${(mrr / 1000).toFixed(1)}K`}        sub={`${paidList.length} paid`}                                                                        subColor="var(--green-text)" />
-            <StatCard label="Overdue"       value={overdue.length}                         sub={`₹${overdue.reduce((s, b) => s + (b.monthly_amount ?? 0), 0).toLocaleString('en-IN')} at risk`}  dotColor="var(--red-text)"    subColor="var(--red-text)" />
-            <StatCard label="Due Soon"      value={dueSoon.length}                         sub={`₹${dueSoon.reduce((s, b) => s + (b.monthly_amount ?? 0), 0).toLocaleString('en-IN')} expected`} dotColor="var(--yellow-text)" subColor="var(--yellow-text)" />
+            <StatCard label="Monthly MRR"   value={`₹${(totalMrr / 1000).toFixed(1)}K`}  sub="all active clients"                                                                                          dotColor="var(--green-text)"  subColor="var(--green-text)" />
+            <StatCard label="Collected"     value={`₹${(collected / 1000).toFixed(1)}K`}  sub={`${paidList.length} fully paid`}                                                                              subColor="var(--green-text)" />
+            <StatCard label="Overdue"       value={overdue.length}                         sub={`₹${overdue.reduce((s, b) => s + (b.pending_amount ?? 0), 0).toLocaleString('en-IN')} at risk`}   dotColor="var(--red-text)"    subColor="var(--red-text)" />
+            <StatCard label="Due Soon"      value={dueSoon.length}                         sub={`₹${dueSoon.reduce((s, b) => s + (b.pending_amount ?? 0), 0).toLocaleString('en-IN')} expected`}  dotColor="var(--yellow-text)" subColor="var(--yellow-text)" />
           </>
         )}
       </div>
@@ -107,7 +108,7 @@ export default function BillingPage() {
             >
               {t.label}
               <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 11, background: activeTab === t.id ? 'hsla(219,74%,53%,0.2)' : 'var(--border)', color: activeTab === t.id ? 'var(--accent-text)' : 'var(--text-muted)', borderRadius: 20, padding: '1px 6px' }}>
-                {t.id === 'due' ? dueSoon.length : t.id === 'late' ? overdue.length : paidList.length}
+                {t.id === 'due' ? dueSoon.length : t.id === 'late' ? overdue.length : t.id === 'pending' ? pendingList.length : paidList.length}
               </span>
             </button>
           ))}

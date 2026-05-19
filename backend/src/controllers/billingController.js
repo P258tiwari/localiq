@@ -128,7 +128,6 @@ export function getAllClientsBilling(req, res, next) {
       SELECT c.id AS client_id, c.business_name, c.city,
         COALESCE(cb.plan_name, 'No Plan') AS plan_name,
         COALESCE(cb.monthly_amount, 0)    AS monthly_amount,
-        COALESCE(cb.payment_status, 'pending') AS payment_status,
         cb.next_due_date,
         cb.plan_end_date,
         COALESCE(cb.plan_total, 0) AS plan_total,
@@ -138,19 +137,48 @@ export function getAllClientsBilling(req, res, next) {
         MAX(0,
           CASE WHEN COALESCE(cb.plan_total, 0) > 0
             THEN cb.plan_total
-            ELSE cb.monthly_amount * CASE cb.billing_cycle
+            ELSE COALESCE(cb.monthly_amount, 0) * CASE cb.billing_cycle
               WHEN 'monthly'   THEN 1
               WHEN 'quarterly' THEN 3
               WHEN 'annually'  THEN 12
               ELSE 1 END
           END
           - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id), 0)
-        ) AS pending_amount
+        ) AS pending_amount,
+        -- Effective status computed from actual payments vs plan total
+        CASE
+          WHEN COALESCE(cb.plan_name, 'Free') = 'Free'
+            THEN 'paid'
+          WHEN MAX(0,
+            CASE WHEN COALESCE(cb.plan_total, 0) > 0
+              THEN cb.plan_total
+              ELSE COALESCE(cb.monthly_amount, 0) * CASE cb.billing_cycle
+                WHEN 'monthly' THEN 1 WHEN 'quarterly' THEN 3 WHEN 'annually' THEN 12 ELSE 1 END
+            END
+            - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id), 0)
+          ) <= 0
+            THEN 'paid'
+          WHEN cb.next_due_date < date('now')
+            THEN 'overdue'
+          WHEN cb.next_due_date <= date('now', '+7 days')
+            THEN 'due_soon'
+          ELSE 'pending'
+        END AS payment_status
       FROM clients c
       LEFT JOIN client_billing cb ON cb.client_id = c.id
       WHERE c.status != 'inactive'
       ORDER BY
-        CASE cb.payment_status WHEN 'overdue' THEN 1 WHEN 'due_soon' THEN 2 WHEN 'pending' THEN 3 ELSE 4 END,
+        CASE
+          WHEN cb.next_due_date < date('now') THEN 1
+          WHEN cb.next_due_date <= date('now', '+7 days') THEN 2
+          WHEN MAX(0,
+            CASE WHEN COALESCE(cb.plan_total,0) > 0 THEN cb.plan_total
+              ELSE COALESCE(cb.monthly_amount,0) * CASE cb.billing_cycle
+                WHEN 'monthly' THEN 1 WHEN 'quarterly' THEN 3 WHEN 'annually' THEN 12 ELSE 1 END
+            END - COALESCE((SELECT SUM(amount) FROM payment_history WHERE client_id = c.id),0)
+          ) > 0 THEN 3
+          ELSE 4
+        END,
         c.business_name
     `).all();
     res.json({ billing: rows, total: rows.length });
